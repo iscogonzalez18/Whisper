@@ -1,6 +1,7 @@
 # código para la ejecución del programa whisper
 # añadir la ruta al path
 # export PATH=$PATH:/home/kali/.local/bin
+# utilizar mejor simpleCode.py
 
 import whisper
 print(whisper.__file__)
