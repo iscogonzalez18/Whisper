@@ -4,6 +4,10 @@ import whisper
 naudio = "audio.mp3"
 
 model = whisper.load_model("base")
+# cambiamos el idioma a español
+model.set_language("es")
+# cambiamos el idioma a inglés
+# model.set_language("en")
 result = model.transcribe("/home/kali/github/Whisper/audios/" + naudio)
 print(result["text"])
 
