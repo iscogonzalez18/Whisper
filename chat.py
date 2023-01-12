@@ -1,8 +1,8 @@
 import openai
 import os
 
-openai.organization = "org-"
-openai.api_key = os.getenv("OPENAI_API_KEY")
+openai.organization = "org-d6sOkmC5UFSQEz57mmi0kpzM"
+openai.api_key = os.getenv("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")
 
 def chat(prompt):
     response = openai.Completion.create(
