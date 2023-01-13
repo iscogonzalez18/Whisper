@@ -1,31 +1,29 @@
 import openai
-import os
 
 print("Loading OpenAI GPT...")
 openai.organization = "org-d6sOkmC5UFSQEz57mmi0kpzM"
 openai.api_key = "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"
 
 def chat(prompt):
+    # https://beta.openai.com/docs/api-reference/completions/create
     response = openai.Completion.create(
-        engine="davinci",
+        model="text-davinci-003",
         prompt=prompt,
-        temperature=0.9,
-        max_tokens=150,
-        top_p=1,
-        frequency_penalty=0,
-        presence_penalty=0.6,
-        stop=["\n", " Human:", " AI:"]
+        max_tokens=2000
     )
     return response
 
-prompt = "Human: Hello, who are you?"
+prompt = "sintetizame el siguiente texto: Definición oUn asistente virtual es un agente de software que ayuda a usuarios de sistemas computacionales, automatizando y realizando tareas con la mínima interacción hombre-máquina Dispositivos con asistentes virtuales oAltavoces inteligentes (Amazon Echo, Google Home) oAplicaciones de mensajería instantánea (Whatsapp) oComo parte del sistema operativo (Siri, Cortana) oEn un modelo de teléfono concreto (Bixby) oAplicaciones móviles específicas (Cortana, Google Assistant) oRelojes inteligentes oElectrodomésticos"
 
-print(chat(prompt))
+response = chat(prompt)
 
-# request
+# para leer un archivo
+# archivo = open("archivo.txt", "r")
+# prompt = archivo.read()
 
-curl -X POST https://api.openai.com/v1/engines/davinci/completions \
-    -H 'Content-Type: application/json' \
-    
+palabras = prompt.split()
+print("Numero de palabras del input:", len(palabras))
 
-print("Done!")
+print(response,"\n")
+print(response["choices"][0]["text"])
+
