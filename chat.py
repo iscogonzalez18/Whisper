@@ -1,5 +1,11 @@
 import openai
 
+# colores en el print
+from colorama import Fore, Style
+# Fore: BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE, RESET.
+# Back: BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE, RESET.
+# Style: DIM, NORMAL, BRIGHT, RESET_ALL
+
 print("Loading OpenAI GPT...")
 openai.organization = "org-d6sOkmC5UFSQEz57mmi0kpzM"
 openai.api_key = "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"
@@ -13,17 +19,21 @@ def chat(prompt):
     )
     return response
 
-prompt = "sintetizame el siguiente texto: Definición oUn asistente virtual es un agente de software que ayuda a usuarios de sistemas computacionales, automatizando y realizando tareas con la mínima interacción hombre-máquina Dispositivos con asistentes virtuales oAltavoces inteligentes (Amazon Echo, Google Home) oAplicaciones de mensajería instantánea (Whatsapp) oComo parte del sistema operativo (Siri, Cortana) oEn un modelo de teléfono concreto (Bixby) oAplicaciones móviles específicas (Cortana, Google Assistant) oRelojes inteligentes oElectrodomésticos"
-
-response = chat(prompt)
-
 # para leer un archivo
 # archivo = open("archivo.txt", "r")
 # prompt = archivo.read()
 
-palabras = prompt.split()
-print("Numero de palabras del input:", len(palabras))
+while True:
+    prompt = input(Fore.CYAN + "\nEscribe tu pregunta, gracias para salir:\n" + Style.RESET_ALL)
+    if prompt == "gracias":
+        break
 
-print(response,"\n")
-print(response["choices"][0]["text"])
+    response = chat(prompt)
+
+    palabras = prompt.split()
+    print(Fore.BLUE + "Numero de palabras del input:", len(palabras), Style.RESET_ALL)
+
+    # print(response,"\n")
+    print(Fore.GREEN + Style.BRIGHT + response["choices"][0]["text"] + Style.RESET_ALL)
+
 
