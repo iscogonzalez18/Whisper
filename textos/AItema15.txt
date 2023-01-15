@@ -1,0 +1,235 @@
+Bayesian Learning: Naïve Bayes
+BAYES’ APPROACH
+• In “classical” statistics we assume that the observations of a
+variable are random and then we try to infer the values of some
+parameter θ.
+• Note that “probability” is approximated by frequency: if I want to
+estimate the number of rainy days we just need to compute the
+number of days that it actually rained and divide such number by
+365.
+• This is what we call the frequentist approach to probability.
+• The approach that Thomas Bayes proposed in the 18th century
+was completely different.
+• Under the bayesian approach, parameters are random, coming
+from some distribution and data is considered to be “known”.
+• Data is used to provide information about the true value of the
+parameter, given the evidence they provide.
+• The bayesian approach allows to deal with situations where no
+frequency can be calculated because no past data has been
+observed, e.g. if we want to estimate the probability of alien life.
+• Under the bayesian approach, some probability is proposed,
+regardless on whether it can be observed or not, then, evidence
+(data) us used to recalculate such probability.
+• Bayes’ theorem is one of the most powerful analytical tools that
+you can imagine, surprisingly, its demonstration is trivial.
+• If you consider the well known property of the joint probability:
+Which is exactly the Bayes Theorem (Bayes, 1763)
+• Example: you have one fair coin, and one biased coin that for
+which Heads has a probability of 75%, you pick randomly one of
+the coins and after flipping it four times you discover you
+obtained Heads always, what is the probability that the coin you
+picked is the fair one?
+• Let A be the event that the chosen coin lands Heads four times
+and let F be the event that we picked the fair coin
+• We are interested in P(F|A) but note that it is easier to find
+P(A|F) and P(A|Fc
+), so applying Bayes Theorem:
+p(F A) =
+P(A F)p(F)
+p(A)
+=
+P(A F)p(F)
+p(A F)p(F) + p(A F
+c
+)p(Fc )
+=
+=
+(1/ 2)
+4
+(1/ 2)
+(1/ 2)
+4
+(1/ 2) + (3 / 4)
+4
+(1/ 2)
+≈ 16%
+• In the case of parameter estimation (remember that, as defined,
+learning consist on estimating the optimal parameters of some model),
+if we want to estimate the value of a particular parameter, we can
+assume some distribution of θ, p(θ), which is called the prior distribution.
+• This distribution is either proposed using all the available knowledge or
+simply “invented” in the case we can not propose a “reasonable” one
+(for example one can use formulas such as the Drake equation for
+extraterrestrial life).
+• For example, in a football game, if we know absolutely nothing about
+the teams that play, we can simply estimate the prior probability of a
+team to win to be 0.5.
+• When no expert knowledge regarding the prior distribution is available,
+in Bayesian terminology it is a non-informative prior, and assigns equal
+probability to all values of the parameter (a uniform distribution).
+• Under the Bayesian approach, we will modify the prior
+distribution conveniently, based on the evidence observed (X), to
+calculate a new posterior distribution:
+• The posterior distribution can be calculated using the Bayes
+Theorem:
+is called the likelihood function
+is called the marginal distribution of data
+as mentioned, it is called the prior
+• The prior is the probability a hypothesis was true before we
+conduct any experiment or employ any data.
+• The likelihood is the probability that you would get the observed
+data if the hypothesis were true.
+• The posterior is the probability a hypothesis is true given the data.
+• Notice that P(X) will be essentially a constant, given some data
+and model (it does not depend on θ ), so we have
+• When we have no knowledge (data), the prior will dominate
+• When we have a lot of data the likelihood will dominate
+• In general it would be extremelly difficult to calculate P(X) but
+most of the times this is not crucial because we want to compare
+two alternative hypothesis
+• In frequentist statistics we are interested in a particular value of a
+parameter (or event) but notice that in the Bayes Theorem the
+posterior distribution is a whole distribution, so we could
+compute any statistic or moment, for example the mean.
+• In particular, it is common to calculate the value of the parameter
+that maximizes the posterior distribution and this procedure is
+called the maximum a posteriori method (MAP method):
+θ MAP
+=
+θ
+argmax p(θ X) =
+θ
+argmax p(X θ )p(θ )
+• The Bayes approach has been criticized for several reasons:
+• It may be extremelly difficult to agree on a prior, so that it is
+possible that data is used to calculate several posteriors i.e.
+there will not be a single model
+• When dimension is high, the bayesian approach will fail
+because the calculation of the denominator (the marginal
+distribution of X) require computing all possible values of
+the parameter, making it infeasible in many applications.
+NAÏVE BAYES
+• One ML method that is based on the preceeding ideas is Naïve
+Bayes (also called Naïve Bayes Classificator), the term “naïve” is due
+to the fact that we will make a strong assumption that rarely
+holds in real life.
+• We say that two variables are conditionally independent given the class
+iff:
+• And generally:
+• Note that assuming conditional independency among the features
+is quite unreasonable
+• Example: Let us suppose that any fruit can be characterized by its
+length, swetness and color and let us suppose we have recorded
+the following data
+• Assume that we find one piece of fruit is long, yellow and sweet,
+what kind of fruit is it?
+• Note that we have to compute:
+long sweet yellow fruit TOTAL
+400 350 450 banana 500
+0 150 300 orange 300
+100 150 50 other 200
+p(banana long,sweet,yellow)
+p(orange long,sweet,yellow)
+p(other long,sweet,yellow)
+• We have p(banana long,sweet,yellow) =
+p(long banana)p(sweet banana)p(yellow banana)p(banana)
+p(long)p(sweet)p(yellow)
+=
+0.8 × 0.7× 0.9x0.5
+0.5 × 0.65 × 0.8
+= 0.96
+p(orange long,sweet,yellow) =
+p(long orange)p(sweet orange)p(yellow orange)p(orange)
+p(long)p(sweet)p(yellow)
+=
+0 × 0.7× 0.9x0.3
+0.5 × 0.65 × 0.8
+= 0
+p(other long,sweet,yellow) =
+p(long other)p(sweet other)p(yellow other)p(other)
+p(long)p(sweet)p(yellow)
+=
+0.5 × 0.75 × 0.25x0.2
+0.5 × 0.65 × 0.8
+= 0.07
+• So, in fact we are interested in:
+• For example, in hand-digit recognition we have Y = 0,1,2….,9 and Xi
+the pixels of 1024 x 1024 image and we want to find the number that
+has the highest probability given the pixels.
+• Since the probability of “banana” is much higher than the other
+alternatives, the answer to the proposed question should be
+“banana”.
+• It is important to understand which might be the effect of the
+conditionallly independence assumption of the features,
+obviously such assumption is unreasonable in most of the
+problems (e.g. education and income) so one would expect a bad
+performance of the algorithm.
+• Nevertheless the results of Naïve Bayes are, many times, the best
+compared to more sophisticated competing algorithms such as
+knn and decision trees.
+• Several authors have suggested explanations for this optimality.
+• From a practical point of view, the question is not whether or not
+we are estimating the probabilities correctly due to the fact of the
+“naïve” assumption of independence.
+• We are just interested on whether the algorithm can discriminate
+among competing hypothesis so the biases when calculating
+probabilities are not so important to the extent that they affect
+similarly the hypothesis.
+• In this sense, we do are not really interested on whether the
+probability for “banana” is correct or no, we are just interested on
+whether “banana” is the most plausible hypothesis.
+• Regarding the application of Naïve Bayes to practical problems it
+must be mentioned that it is a powerful method in binary or
+multiclass classification but NOT in regression.
+• A number of papers have shown that Naïve Bayes, most of the
+times, is dominated by other ML methods in regression so that
+most of the researchers and practitioners do not employ it in this
+kind of problems.
+• The assumption of conditional independence given the class is an
+essential factor for reducing the computational load in the
+calculation of probabilities.
+• Assuming that X has dimension n we would need to estimate
+2(2^n-1) parameters in case of not assuming conditional
+independence and 2n in case we assume it, for n=30 this reduces
+the number of calculations from more than 30 billion to just 60.
+• Returning to the case of parameter density estimation, note that
+the assumption of independence transforms the MAP in:
+• Notice that, in some cases, we would not have enough data to
+observe (estimate) all the conditional probabilities.
+• In case any conditional probability is zero, e.g.
+• This will make the likelihood
+• This situation is called the zero probability problem.
+• Again, note that the above probabilities will be estimated by the
+observed frequency and when there are no observations of a
+particular joint event the frequency will be zero.
+• For this reason, it is common to employ a Laplacian correction (also
+Laplacian modification or Laplace smoothing) which consists on
+artificially increse the frequency of all the probabilities by one
+(k=1), i.e.
+• To summarize we can mention the following advantages and
+disadvantages of Naïve Bayes
+• Advantages:
+1. Easy to understand
+2. Can be applied even with small datasets
+3. If conditional independence is true, Naive Bayes is the
+BEST classifier one may build
+4. Excellent performance in most of the cases
+5. Computationally very efficient (eager)
+6. Insensitive to irrelevant features
+7. Robust to outliers (particularly in the discrete case)
+8. Robust to missing data
+9. Compared to other algorithms it does not need to be finely
+“tuned”, there are no hiper parameters (except the “prior”)
+10. New data can easily be incorporated without changing the
+structure of the model 26
+• Disadvantages:
+1. Zero probability problem requires artificially modifying the
+distribution
+2. The performance degrades when there is a high interacion
+among the variables
+3. It does not provide “true” estimated probabilities
+4. For continuous variables one needs to either use some
+model or discretize the variable
+5. Can not be used in regression problems
+6. It can not learn intractions between features
+7. Different priors will produce different models

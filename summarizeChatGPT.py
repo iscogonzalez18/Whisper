@@ -25,9 +25,9 @@ def chat(prompt, maxTokens):
 # lee un archivo y devuelve un array con las frases
 def read_article(file_name):
     file = open("/home/kali/github/Whisper/textos/" + file_name, "r")
-    filedata = file.readlines()
+    filedata = file.read()
     # print(filedata,"\n")
-    return filedata[0].split(". "),numeroTokens(filedata[0])
+    return filedata.split(". "),numeroTokens(filedata)
 
 # devuelve el numero de palabras de un texto
 def numeroTokens(texto):
@@ -66,7 +66,7 @@ def getResusmenResumido(file_name, tamañoResumenFinal, palabrasParrafo, tokensM
             maxTokens = tokensMaxModelo - tokensPrompt
             response = chat(prompt, maxTokens)
             resumen = response["choices"][0]["text"]
-            # print(response)
+            print(response)
             # print("Resumen:", resumen)
             resumenes.append(resumen)
             tamañoResumen = len(resumen.split())
@@ -95,7 +95,7 @@ def getParrafos(sentences, palabrasParrafo):
 
 # palabras que recibe chatgpt = entre 1900 y 2000 para recibir respuesta de 1000 mas o menos
 # texto, tamañoResumen, palabrasParrafo, tokensMaxModelo
-resumenResumido = getResusmenResumido("holamuybuenas.txt", 'mitad',  700, 3250)
+resumenResumido = getResusmenResumido("marianTexto.txt", 'mitad',  700, 3250)
 for resumen in resumenResumido:
     print(resumen)
 

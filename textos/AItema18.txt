@@ -1,0 +1,798 @@
+Generative Models
+2
+INTRODUCTION
+3
+• Deep Learning models are almost as rich and varied as the
+problems they try to solve, given the accelerated production of
+research papers in this area we can say that probably every week
+one new model (more or less relevant) is proposed.
+• Among the novel architectures, generative models, are one of the
+best known even by the general public because of the famous
+deepfakes.
+• Deepfakes are videos digitally altered, using neural networks, and
+which merge real information with fake one, for example, one
+actual shot of a politician whose gestures and voice are replaced
+by others performed by actors.
+4
+• While deepfakes are certainly appealing in the context of ML,
+this is not the most interesting application of such models.
+• The possibility of creating surrogates, is extremely useful in
+situations when the number of data points is limited, this is the
+case of several healthcare problems.
+• For example, we could be interested in a supervised feedforward
+network which may diagnose some particular disease using MRI,
+the problem is that not enough MRI images may be available,
+making it impossible (or inaccurate) using such models.
+• One alternative could be to create such MRI images
+synthetically.
+5
+• A different situation occurs when one needs to share some
+information but the information is protected or should comply
+with some regulation (e.g. HIPAA, GPRD).
+• One possibility is to create a new example which has the same
+relevant information as the original one but which makes
+impossible to identify the personal information or other.
+• In contrast to discriminative models, that are used to classify
+examples into different classes, generative models are used to
+generate precisely one or several examples of a particular class.
+• Of course, the idea is that the generated example is recognized
+as a member of such class, but it should be somehow different
+since it would be of no interest generating another copy of the
+same example.
+6
+• Generally speaking, a particular specimen x, in probabilistic
+terms, is just one observation of the data distribution which
+generated x, p(x). The idea of generative models is to learn how
+to model such distribution so that it is possible to sample from
+it and obtain specimens which are statistically indistinguishable
+from the original.
+• Even though this problem has been outside of the scope of
+ML, a number of architectures have been proposed such as
+Variational Auto Encoders, Generative Adversarial Networks and,
+more recently, Diffusion models.
+7
+AUTOENCODERS
+8
+• To understand the mechanics of generative architectures it is useful
+to first understand what encoding means.
+• As said, in many situations the dimensionality of the input can
+be very high and we can be interested in reducing it, this is
+precisely the objective of classical techniques such as Principal
+Components Analysis (PCA), these techniques are called
+dimensionality reduction.
+• For example, videos and images, unprocessed, would require a
+high bandwidth channel which can be unavailable in some areas
+and situations or which simply can be too costly.
+• One possibility would be to compress somehow such
+information and send it through the channel, then, the receptor
+may un-compress the information to obtain a restored
+image/video/sound.
+9
+• In fact, the common extensions of videos such as “mp4” are
+compressed versions or original digital content which has been
+processed with some algorithm to reduce the amount of
+information that needs to be transmitted.
+• For example, assume that we need to send two images that
+differ on a few pixels, one compressing algorithm could identify
+the pixels that change and transmit only such pixels.
+• Of course, the quality of the restored video critically depends
+on the quality of the compressing algorithm.
+• Deep Learning can be used to perform such compression, for
+example, consider the following architecture:
+10
+X X Encoding Decoding
+Hidden state
+Compress De-compress
+x1
+x2
+x3
+x4
+x5
+a1
+a2
+x1
+x2
+x3
+x4
+x5
+ENCODER DECODER
+11
+• Note that this is just a standard feedforward neural network where the
+input and output are the same.
+• The purpose of this network is just to provide an output which is
+identical to the input.
+• Notice that the hidden layer has a smaller dimension than the
+input and output layers.
+• Also notice that the output of the network is obtained from the
+hidden layer.
+• In some sense, all the information which is present in the input
+layer is also present at the hidden layer, which has a smaller
+dimension.
+12
+• This means that, in our example, instead of needing to send five
+values (x1,x2,…,x5) we would need to send only two (a1, a2).
+• Of course the receiver will also need the weights from the
+hidden to output layer to restore the output from the hidden
+state.
+• The purpose of the encoder is to find a representation of some
+input into a latent space.
+• Using this representation in the latent space, the purpose of the
+decoder is to reconstruct a specimen similar or identical to the one
+presented at the input.
+• Note that the hidden layer acts as a bottleneck which creates a
+compressed version of the input specimen.
+13
+• If we call e(X) to the encoded version of X and d(e(X)) to the
+decoded version of a previously encoded X, the objective is to
+construct an encoder so that d(e(X))=X.
+• In many cases this is not totally possible, so that the idea is to
+try to minimize the difference between the real output, X, and
+the decoded version, d(e(X)).
+• We can use any appropriate loss function (L) for calculating this
+difference.
+• The idea is, then, to find the optimal encoder (eopt) and decoder
+(dopt) so that such difference is minimized, i.e.:
+(eopt, dopt) = argminE,D L(X,d(e(X))
+14
+• Note that solving such problem is exactly the same as training
+two feedforward networks (one for encoding and the other for
+decoding) simultaneously and so, the usual algorithms (e.g.
+backpropagation) can be used.
+• The problem becomes:
+���!,# (�(�, Θ,Ω),X)
+• Where Θ,Ω are respectively the weights of the encoder and the
+decoder.
+15
+• Auto encoders are usually described as unsupervised learning
+unsupervised because we do not employ other information than
+the input, which is also the output, but in fact can be also
+considered supervised because we have a target and we can
+explicitly measure the difference between the expected and
+produced output.
+16
+• In autoencoders the hidden layer does not need to be unique, it
+is very common to perform compression and de-compression in
+several steps using successively smaller layers, these models
+which employ a stack of layers are called deep auto-encoders or
+stacked auto-encoders. Input layer Size n
+Output layer
+Size n
+Hidden Layer
+Size m <n 1
+Hidden Layer
+Size m
+<2 m1
+Hidden Layer
+Size m <n 1
+de-compression
+ENCODER
+17
+• One problem of autoencoders is that they may overfit the data,
+considering inputs that are unimportant or irrelevant to
+reconstruct the input.
+• Several remedies have been proposed to handle this problem, the
+most obvious is to employ a regularized loss function that, along
+training, eliminates irrelevant features, i.e.
+�((�, Θ,Ω),X) + λ (Θ,Ω)
+• Another approach is to build a sparse autoencoder, which penalizes
+not weights, but activations of neurons at hidden layers, this
+makes to sensitize hidden nodes toward specific features of the
+input, there are several alternatives to do this, one possibility is
+�((�, Θ,Ω),X) + λ (�)
+Where a is the activation of neurons at hidden nodes.
+18
+• Interestingly, autoencoders can be employed to solve other
+problems not directly related to information compression.
+• For example one could use some input corrupted by noise and
+force the encoder to output the denoised “true” input, i.e.,
+d(e(X+�))=X. After training the autoencoder with noisy
+generated inputs we could use it to “restore” new exemplars.
+• Another possibility is to completely remove parts of the input
+and proceed similarly, after training the auto encoder will be able
+to complete parts the input, i.e. d(e(X-{x}))=X.
+19
+VARIATIONAL AUTOENCODERS
+20
+• The problem with autoencoders (also its advantage) is that once
+they have been correctly trained, the response is totally
+predictable, since the decoder just reconstructs the input.
+• But in some applications what we want is to generate examples
+which are somehow similar, but not identical, to the inputs. For
+example, we may want to create a new face with similar facial
+characteristics but which differs from the original one in, say, the
+eyes.
+• In such cases what we demand is some “creativity” from the
+network, of course this creativity can not be totally random: it
+must include characteristics which are recognizable in the
+original.
+21
+• To solve such problems, Variational Auto Encoders (VAEs) were
+introduced (Kingma and Welling, 2013).
+• Essentially, VAEs include two modifications of standard
+autoencoders. First, the inputs are encoded in the latent space
+not as points but as distributions, and second, the network is
+regularized to have some desirable properties.
+• In a VAE the encoder generates a whole distribution in the
+latent space, instead of a single point as in a regular
+autoencoder.
+• Since we now have a distribution in the hidden space, this can
+be sampled to reconstruct an output -via decoding- to produce
+one or several surrogates of the original data point.
+22
+X X Encoding
+Decoding
+Hidden state
+Compress De-compress
+�
+�
+23
+• The training of a VAE follows the steps:
+1. One input is encoded as distribution over the latent space
+2. A point from the latent space is obtained by sampling from
+that distribution
+3. This point is decoded
+4. The error of the reconstruction is computed and
+backpropagated through the network
+• The loss that it is used includes two terms:
+1. A reconstruction term that tries to make the encodingdecoding scheme as efficient as possible
+2. A regularisation term, that force the distributions at the latent
+space close to a normal distribution
+24
+• Formally, in a VAE we try to estimate the probability
+distribution of the inputs with the aim to sample from such
+distribution to obtain new observations, i.e. we are interested in
+p(x).
+• We could marginalize such distribution using a latent variable z,
+in the following form:
+� � = 2 � � � � � ��
+• The problem is that � � � can not be directly calculated and
+we we have to perform some statistical manipulation by using an
+intermediate reverse distribution � � � .
+25
+• In a VAE the idea is to create a model (for example a CNN)
+indexed by some parameters � that compresses some data into a
+latent space, this is the encoder.
+• Formally, the encoder models the probability of the latent
+variable given the observed one, i.e.
+�� � �
+• The encoder is generally referred as a bottleneck because it is
+common that the latent space has a smaller dimension than the
+input and its duty is to compress, in an efficient way, the
+information present in the input.
+26
+• The encoder provides parameters to a known distribution of the
+latent space p(z). This is one of the tricks of VAEs, to use a
+known distribution so that the mathematical complexity can be
+reduced.
+• Note that hist parameterized distribution can be used to sample
+z.
+• Typically, the encoder provides parameters (�, �) to a normal
+distribution N(�, �).
+27
+• In the second stage (the decoder), we try to reconstruct the data
+given the hidden representation, in this case this is equivalent of
+modelling the conditional probability of some output x given
+the hidden representation z, i.e.
+�$ � �
+• The decoder takes as input the latent representation sampled
+before and outputs some reconstruction of x.
+• For the decoder we can also use some model such as another
+neural network, with parameters �, that must be tuned to
+provide optimal results.
+• Since both the encoder and the decoder need to be trained, we
+need to define some loss function which is minimized to find
+the optimal parameters (�*
+,�*).
+28
+• The explanation of the learning mechanics of VAEs requires
+the introduction of some statistical background, in particular de
+Kullback-Leibler divergence.
+• The Kullback-Leibler divergence is a measure of the difference
+between two distributions, P and Q, in a probability space X, it
+is defined as:
+��%,& = ∑'∈) � � log %(')
+&(')
+= �,(log(� �) − (log(� �)
+• In words, it is just the expectation of the logarithmic difference
+(generally, base 2) between P and Q.
+• The KL divergence measures in bits (log2) how much
+information is lost by using the approximating distribution
+instead of the original one.
+29
+• Note that the KL distribution is not a distance but a divergence, it is
+not symmetric:
+��(�,�) ≠ ��(�, �)
+• Also note that we could employ some distribution to
+approximate the original one by “fitting” the parameters that
+index such distribution, i.e.
+�∗
+= �$∗ �∗
+= ������$��(�,�$)
+30
+• Now, returning to the VAE, the idea is to generate data x using
+some latent variable z, this means that we want to sample from
+� � � ,the problem is that such distribution is unknown.
+• This distribution is the posterior of z given x and consequently
+we can use use the Bayes’ theorem to reverse –and simplifycalculations:
+���� � � =
+!"#$ � � !"#$(&)
+!"#$(()
+=
+!"#$ � � !"#$(&)
+∑! !"#$ � � !"#$(&)
+• The problem is that the denominator, known as the evidence, is
+generally untractable so that the direct calculation of the
+posterior is, most of the times, not possible.
+31
+• Alternatively, we could find some distribution which
+approximates the posterior by minimizing the KL divergence
+between them, i.e.:
+�∗ � = ������.��(� � , � � � )
+• Since we have ��(� � , � � � ) = �.(log(� �) −
+�.(log � � � ) = �.(log(� �) − �. log �(�, � −
+�. log �(� = �.(log(� �) − �. log �(�, � − log �(�
+• The highlighted term is the negative of what is called the
+ELBO (Expected Lower BOund), and it is the only term that
+depends on the chosen distribution q.
+• If we want to minimize the KL divergence, we must maximize
+the ELBO because the difference between them is a constant.
+32
+• So, the idea is to choose a proper distribution q and find the
+parameters that index it which maximize the ELBO.
+• One obvious problem is to select the appropriate q, one
+possibility is to consider that q(z) is a standardized normal
+distribution and � � � also a normal distribution with
+parameters (�, �)
+• Note that the stochasticity of the � � � would make
+impossible to tune the parameters of the network using
+backpropagation, so, a re-parameterization trick, is employed
+essentially consists on decomposing such stochasticity into two
+terms, one deterministic and the other purely stochastic, i.e.
+N(�, �)= �+ �N(0,1), note that � and � are deterministic
+parameters that can be trained with backpropagation.
+33
+• To approximate each of the probabilities mentioned we can use
+neural networks, in particular, we need a neural network to find
+the probability distribution for the encoder and another one for
+the decoder.
+• Since the probability that describes the latent space is a normal
+which depends on just a mean and a variance, both can be
+calculated by neural networks � � and ℎ � which share part
+of their weights.
+• In summary, a VAE is built by minimizing a loss function which
+incorporates the two terms mentioned before (the regularization
+and the reconstruction term), i.e.:
+� �, �(�) = �� � � � , ℎ � , � 0,1 + � − �(�)
+34
+• The whole process is as follows: the encoder is trained to learn
+the means and standard deviations in the latent space, then to
+generate a new observation, we sample from such latent space
+and pass it through the decoder.
+X Encoder
+�
+�
+sample
+N(�, �)
+q�(z∣x)
+z Decoder
+p�(x∣z)
+X’
+f(z)
+h(x)
+g(x)
+35
+GENERATIVE ADVERSARIAL NETWORKS
+36
+• Generative Adversarial Networks (GANs) are deep learning models
+that employ two networks: one of them tries to generate
+examples similar to a particular one and the other tries to
+discern whether the example is real or fake.
+• Similarly to VAEs, have two components but in this case we call
+them the generator and the discriminator.
+• The purpose of the generator is to create a set of samples, similar
+to the real ones, which are passed to the discriminator which tries
+to perform a classification between real and synthetically
+generated examples.
+• The magic idea of GANs is to force these two modules to
+compete between them, so that the generator will try to generate
+examples which are classified as “real” by the discriminator
+while the discriminator will try to improve its classification
+performance trying to minimize the number of
+misclassifications between real and fake examples.
+37
+thispersondoesnotexist.com
+• After training, when a particularly good generator is found, it can
+be used to generate synthetic examples that does not exist in real
+life.
+• See the following example:
+38
+• At the start, the generator just produces random examples
+without any hint of how a real example is.
+• On his side, the discriminator tries to determine which ones are
+real and which ones fake with the help, only at the start, of an
+external teacher.
+• The generator receives some score given by the discriminator
+that helps it to improve the generation of examples.
+• The goal of the generator is, then, to produce more realistic
+examples along time while the role of the discriminator is to be
+able to distinguish between real and fake images, a task that
+becomes more and more complicate as the generator improves
+its performance.
+• Note that the word “adversarial” clearly illustrates the
+competition between these two modules in GANs.
+39
+• The purpose of the discriminator is to calculate the probability
+that some example belongs to some particular class (Y) given its
+features (X), .i.e.:
+P(Y│X)
+• To learn such probability any machine learning model can be
+used but, generally, a neural network model is used.
+• This probability is passed to the generator, which now has an
+intuition of how good the generated example is.
+40
+• As mentioned, the goal of the generator is to create realistic
+examples of some class.
+• To do so, a neural network is employed, where the inputs of the
+network are random features, e, as well as the class that the
+example should belong to, Y, and the output are the features of
+the example, i.e.:
+�M = �(�)
+• The features �M (the generated example) are then passed through
+the discriminator, which tries to decide whether the example is
+real or fake.
+• Note that in this phase the discriminator is fed both with real
+and fake examples.
+41
+• The discriminator outputs some value using an appropriate loss
+function which compares the actual output �M (the predicted
+class) with the expected output Y (the actual class).
+• This loss g( �M, � ) is propagated backwards to update the
+parameters q of the generator which tries to improve the
+generated examples trying to minimize the error detected by the
+discriminator.
+• In GANs the most popular loss function is the binary crossentropy.
+42
+• Once the generator has achieved the desired performance, the
+parameters of the generator are fixed, and the generator can be
+used to create realistic examples by sampling from a noise
+distribution at the input.
+• Note that the generator, in contrast with the discriminator, is
+trying to model the conditional probability of features given
+some particular class:
+P(X│Y)
+• Which is exactly the inverse as the probability of the
+discriminator tries to model.
+• Note that the role of the discriminator is simpler, since it only
+has to output one label for the example while the generator has
+to output a usually high number of features that represent the
+fake example.
+43
+• Training a whole GAN involves two alternating phases: during
+the first one the discriminator is improved, while in the second
+one, the generator increases its performance.
+• As said, the generator creates a set of fake observations
+sampling from a noise distribution.
+• These examples are fed to the discriminator whose functioning
+fits exactly as a classical neural network: it receives examples and
+the classes (fake and real), calculates some loss function and
+backpropagates the errors adapting the weights, θd.
+• As we will see now, it is not necessary that predictions are
+perfect, and the purpose of this phase is just to improve the
+discriminating ability.
+44
+First phase
+The discriminator is trained using fake and real data
+45
+• The second phase consists of training the generator.
+• In this phase synthetic examples are created as before, and they
+are fed to the discriminator, in this phase no real examples are
+used.
+• After feeding the discriminator, the output is produced, since
+we want the generator to create only realistic examples, in the
+computation we assume that all the examples are real and
+compute the loss function for this single class.
+• This error is propagated back, but now to the generator which
+will modify the weights trying to maximize the loss function.
+46
+Second phase
+The generator is using only fake data passed to the discriminator
+47
+• Assume we call h(x(i)
+,q) the output of the network, where x(i) is
+the i example and q the parameters of the network.
+• Assume that y(i) is the expected output for example i, the binary
+cross entropy is computed as:
+• Note that the cost is computed along the whole training set (or 
+the training batch), with examples m. 
+• Note that whenever �(#) = log ℎ � #
+, � the loss for the example
+is zero, since the network has found the correct target.
+�(�) = − 1
+�)*�(,) log ℎ1�(,)
+, �4 + (1 − �(,)
+) log 61 − ℎ1�(,)
+, �478
+9
+,:;
+48
+• Note also that whenever �(#) = 0 the first part of the function
+�(#) log ℎ � #
+, � is zero and so the loss for the example is also
+zero, it will be a negative number whenever the prediction is
+different from zero.
+• When �(#) = 1 the second part of the function (1 − � # ) log /
+0
+1 −
+ℎ � #
+, � is zero and so the loss for the example is also zero, it
+will be a negative number when the prediction is different from
+one.
+• Viewed in this way, the second part of the equation is used to
+calculate errors when the real value is zero while the first part
+of the equation is used to calculate errors when the real value is
+one.
+49
+• The negative sign at the beginning of the equation transforms
+the negative numbers into positive ones, in consistency with the
+intuition of a cost function which needs to be minimized.
+• In what follows we will assume �(#) = 1 for real observations
+and �(#) = 0 for fake observations.
+• With this convention the first part of the equation measures
+how bad the discriminator is when classifying real observations
+(for which �(#) = 1 ) while the second part measures how bad it
+is for classifying fake observations produced by the generator
+(for which �(#) = 0 ).
+50
+• Now, returning to the tasks for each of the modules, note that
+the objective of the discriminator is to make the loss function
+as small as possible, since this would mean that it misclassifies
+few examples.
+• Contrary to that, the objective of the generator is to make this
+function the highest since it wants the discriminator to take as
+real all the fake examples it produces.
+• Also note that in the case of the generator, all the examples
+that are passed to the discriminator are fake, so that only the
+second part of the above equation plays a role.
+51
+• Since both of the modules are antagonistic, the problem can be
+seen as a minimax problem in Game Theory where two agents
+have adversarial objectives.
+• It can be proved that learning essentially consists on finding a
+Nash equilibrium where both the generator and the
+discriminator implement a best response to the actions of the
+other.
+52
+• Re-writing the above equation, the problem which needs to be
+solved is:
+where E is the mathematical expectation.
+• It is important to understand that when we are training the
+models, the performance of the discriminator and the
+generator should be comparable.
+• Otherwise, if we had, for example, a discriminator which
+perfectly predicts all the fake examples it would be impossible
+for the generator to improve.
+• Nevertheless, the basic structure shown has some problems
+particularly what is called the mode collapse as well as the
+previously mentioned of vanishing gradients.
+min
+$
+max
+' −)�(log/�(�)3 + � (1 − log (�(�(�))9
+53
+• Mode collapse happens when the generator gets stuck in
+generating one particular example that efficiently fools the
+discriminator, but it is unable to create other examples that do
+so.
+• In some sense, the generator learns a “trick” that works for
+fooling the discriminator and employs it again and again.
+• Regarding vanishing gradients, since the loss functions used
+(binary cross entropy) has an s-shape some areas of the
+function (the extremes) show little variation when the output
+changes, this means that the gradient would be close to zero, so
+that learning would eventually slow or even stop.
+Ñ » g 0
+Ñ » g 0
+54
+• As an alternative, and to avoid vanishing gradients, it has been
+proposed to use another loss function called Earth´s Mover
+Distance (EMD).
+• The EMD measures the amount of effort to transform one
+distribution into another.
+• One may think as moving one pile of sand to replicate another
+pile of sand.
+• The EMD considers both distance and amount of frequency
+moved, similarly as in the real world.
+• The EMD is not bounded, avoiding the problem of the BCE
+which is bounded between zero and one and suffers from the
+vanishing gradients problem.
+55
+• Since Binary Cross Entropy (BCE) suffers the problems of
+mode collapse and vanishing gradients it does not seem an optimal
+loss function in the current case.
+• One alternative is to use the Wasserstein loss (W-loss hereafter):
+• Note that the expression is very similar to the BCE with a
+couple of changes.
+• The first one is purely notational since the discriminator (d) is
+replaced by a critic (c).
+• The second one is that the two expectations are subtracted, not
+added.
+• The interpretation of this is that the role of the generator is to
+separate as much as possible the distributions of the real
+examples and the fake ones, since this allows to discriminate
+better between them.
+!�($�(�)( −� (�(�(�))-
+56
+• On an opposite side, the role of the generator is to make them
+as close as possible, since this would mean that the
+discriminator is unable to distinguish real from fake examples.
+The problem then becomes:
+• Since the output of the second network can be now
+unbounded, we can use linear functions instead of a sigmoid
+one at the output.
+• Also, since the second network gives some unbounded grade of
+“fakeness” the name “discriminator” can be changed by “critic”
+which gives an intuitive idea of its behavior.
+min
+�
+max
+� (�*�(�). − �(�(�(�))1
+57
+• To implement the W-loss function one needs to impose that the
+critic must to be 1-Lipschitz continuous which means that the
+gradient should be at most equal to one in any point of the
+error surface.
+• This condition could be ensured by “clipping” the weights of
+the critic network so that the overall gradient is not higher than
+one.
+• The problem with this procedure is that we would be
+constraining the search space of the weights so that it would
+be difficult to find a set of weights that effectively optimizes
+the loss.
+58
+• An alternative is to employ a regularization term for the
+gradient of the critic (in a similar vein as the regularization of
+the weights of a model to avoid overfitting).
+• This can be implemented by including a regularization term to
+ensure that ǁ∇c(x)ǁ≤1.
+• One additional problem is that, since we have to ensure that
+this happens for any x, it would be needed to sample the whole
+feature space.
+• To overcome this problem an interpolated version of a real (x)
+and fake example, g(z), is used:
+ηx+(1-η)g(z)
+where η is any random number.
+59
+• Now, with the W-loss function penalized to ensure Lipschitz
+continuity is:
+min
+%
+max
+&
+� � � − �(�(� � ) + ��( ∇� � − 1)'
+The above function is the one to be optimized.
+60
+• One issue that we have not considered up to now is that fake
+examples are generated without any restriction, i.e. they are
+generated without explicitly assuming any particular class.
+• In some applications it is required that examples come from a
+particular class given a set of possible classes (for example,
+male vs. female), the models that allow to do this are called
+Conditional GANs.
+• In a conditional GAN it is required that the class be passed
+both to the generator and the discriminator.
+61
+• Regarding the generator, now two vectors are needed, one is
+the usual vector of random elements while the other is a one-hot
+vector for the classes.
+• Both vectors are concatenated and passed to the generator
+network.
+• The discriminator also receives this concatenated vector.
+• If the input presented does not belong to the input class then
+the discriminator will label it as fake.
+62
+• Another possibility is to control the features that fake generated
+examples must have instead of controlling the class, this is called
+controllable generation in contrast with conditional generation.
+• In some sense, this is possibility more accurate in the sense that a
+higher granularity is achived.
+• Another difference between these two ways of generating fake
+examples is that in controllable generation you do not need to
+specify the class to which the example belongs, so that it is
+possible to use this method after the model has been trained.
+• To implement controllable generation we need to alter some of
+the input features of the random vector that it is used to generate
+the examples (in a similar fashion as the DNA).
+63
+• Two problems arise when features are changed to generate
+examples with specific characteristics:
+• The first one is that there may exist correlation among the
+characteristics so that changing one of the features it may
+affect two or more instead of only the characteristic of
+interest.
+• The second problem is called z-space entanglement and means
+that features of the examples are encoded in several
+characteristics of the input space. This happens because the
+mapping between characteristics and features is not a oneto-one application and it is generally due to the fact that the
+space of characteristics of the input has a low dimension
+compared to the encoded features.
+64
+• The simplest way to modify the characteristics in the input, so
+that the generated example has the required feature is to use
+some pre-trained classifier that detects whether the example has
+such feature.
+• The output of the classifier is passed back to the generator to
+modify the characteristics until the pre-trained classifier detects
+that the feature is found.
+• Regarding disentangling the z-space we can use a number of
+supervised and unsupervised techniques.
+• Regarding it applications, GANs have been primarily used in
+the context of images and video and as mentioned before.
+65
+DIFUSSION MODELS
+66
+• Diffusion models are generative are models that employ a forward
+diffusion process and a reverse or reconstruction process
+(Sohl-Dickstein et al. 2015, Ho et al., 2020) to generate samples
+similar to the original.
+• The forward diffusion process gradually adds noise to an initial
+sample from a data distribution until it becomes pure noise.
+• After this is done, we perform several “backwards”
+reconstruction steps by fitting a neural network model who
+learns to restore the “diffused” example.
+Nvidia, 2022
+67
+• In the diffusion process, as mentioned, we gradually add noise
+to an initial sample x0 from a data distribution q(x0 )until it
+becomes pure noise.
+Forward
+�! → �" → ⋯ → �#
+� �":# �!
+• We sample noise from pre-defined data distributions
+� �/ �/01 with variances �1, �2, … , �3 .
+• Notice that the forward diffusion process is a Markov chain, so
+that unlike VAE ”encoding” does not require training.
+68
+• The probability density at t only depends on the density at time
+t-1, so that the conditional probability (in the gaussian case) can
+be simply computed as:
+� �/ �/01 = �(�/; 1 − �/�/01, �/�)
+�/ is the variance of the gaussian noise which is added at each
+time step and varies with some specific schedule, it is common to
+choose:
+�1 < �2 < … < �3 , �/ ∈ (0,1) and �/ ≪ 1
+In this way as t increases the variance will tend to zero so that
+� �3 �4 ~�(0,�).
+69
+• The whole forward diffusion process can be expressed as:
+� �1:3 �4 = Y/61
+3
+� �/ �/01
+• The parameters �1, �2, … , �3 can be considered as
+hyperparameters of the algorithm and can be fixed constant or
+to vary in any specified manner.
+70
+• In the reverse diffusion process, we gradually denoise a latent
+variable �3~� �3 to restore x0
+�$(�4:3) =�$(�3)Y/61
+3
+�$ �/01 �/
+• Note that �$(�3)~�(�3, 0,�), i.e., pure white noise
+• Since now have a way to generate x0 from pure white noise it is
+possible to generate new samples which are similar to x0.
+Reverse
+�# → �#%" → ⋯ → �!
+�&(�!:#)
+71
+• The reverse distributions � �/01 �/ are generally unknown
+and neural networks can be used to approximate them.
+• To find the parameters of the network, �, one needs to
+minimize, along the data, a variational lower bound or ELBO
+(Expected Lower BOund):
+log(� �4 )
+≥ �q(x0 ) [
+\
+���,( �4 �1 − �� � �3 �4 � ��
+−_
+/62
+3
+�� � �/01 �/, �4 �$ �/01 �/
