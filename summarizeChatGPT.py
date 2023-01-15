@@ -66,7 +66,7 @@ def getResusmenResumido(file_name, tamañoResumenFinal, palabrasParrafo, tokensM
             maxTokens = tokensMaxModelo - tokensPrompt
             response = chat(prompt, maxTokens)
             resumen = response["choices"][0]["text"]
-            print(response)
+            # print(response)
             # print("Resumen:", resumen)
             resumenes.append(resumen)
             tamañoResumen = len(resumen.split())
