@@ -1,0 +1,82 @@
+GENETIC ALGORITHMS
+3
+• Canon (1932) was probably the first to understand evolution as a
+learning mechanism completely different to the ones performed
+by individuals which are mostly based on trial and error.
+• Notice that humans are able to learn because, in fact, we belong
+to a class of “computing machines” capable of doing so and that
+this ability is just the resuld of evolution.
+• Turing (1950) also noted the “obvious connection between
+machine learning and evolution”, envisioning the use of
+principles of evolution in the construction of thinking machines.
+• Evolutionay algorithms are a powerful alternative way to
+understand learning and they offer an alternative where classic
+techniques such as gradient descent or purely random search
+have proven unsatisfactory.
+• Genetic Algorithms (GA) are heuristic search techniques based
+on the principles of natural evolution which were enunciated by
+Darwin in The Origin of Species in 1859.
+• According to such principles, natural selection stablishes a link
+between the performance of the living beings and the
+chomosomes that encode their genetic information.
+• The process of natural selection has the result that chromosomes
+which encode successful characteristics to reproduce more
+frequently than those who do not.
+4
+• GA were fist proposed by Holland in 1962 but only after 1975
+with the publication of his book Adaptation in Natural and
+Artificial Systems they became relatively popular.
+• Other proposals such as Evolutionary Programming (Fogel et al,
+1966), Evolution Strategies (Rechenberg, 1971; Schewefel, 1974)
+or, more recently, Genetic Programming (Koza, 1992) share
+similar ideas consisting on applying principles of Evolution to the
+solution of general problems.
+• Similarly as with other ML techiniques such as ANNs, GAs are just
+algorithmic abstractions with few or no relationship with the real
+processes they emulate.
+5
+6
+• Notice that in all the algorithms previously seen, the modification of
+the solution is done directly.
+• Contrary to this, Evolution is a biological process that operates on
+the chromosomes rather than on their biological expression (the
+living beign they encode)
+• In contrast, GA operate on coded versions of the solutions, this is a
+paramount diference of GAs, one of its strenghts but also one of its
+drawbacks.
+• In effect, since encoding is so important, the performance of the
+algorith strongly depends on finding such ecoding that support
+easily the search procedures.
+• Encoding is, in the words of some practitioners, more an art than a
+science and it car reveal or destroy the power of GA.
+7
+• Another important diference of GA aganist more
+“clasical”
+procedures is that GA are inherently parallel.
+• Most of the algorithms try to find improved versions of an initial
+solution while GA search for a whole set of better solutions.
+• In this sense, GA implement not only a search in depth but also a
+search in breadth.
+• For GAs it is not essential to find, at some iteration, a solution that it
+is better than the previous one but to find one set of solutions
+which, globaly, are better than the preceeding.
+8
+• GA fall under the class of heuristic algorithms, even though some
+convergence results exist, it can not be generally demonstrated that
+they converge to the global (or even local) optimum.
+• Nevertheless they have show their flexibility and power in many
+applications that range from Finance to Electronics.
+• GA are also robust and accept post-optimality analyses in a natural
+fashion: when the objective function changes significant parts of the
+algorithms are reusable, in contrats with other methods that require
+a full re-writting of the procedures and code.
+• Finally, as we shall see, GA are non deterministic but stochastic, i.e.
+every time they are run on a particular problem they can provide
+different solutions
+• In its most basic form GA employ three operators: Selection,
+Crossover and Mutation.
+• These operators mimic the ones found in Genetics, which is also
+the source for many other operators: diplodism, parasitism,
+elitism, etc.
+• GA are conceptually very simple and can be better explained
+with a simple example taken from (Goldberg, 1996).
