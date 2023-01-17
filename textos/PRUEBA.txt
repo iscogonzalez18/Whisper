@@ -1,82 +1,344 @@
-GENETIC ALGORITHMS
-3
-• Canon (1932) was probably the first to understand evolution as a
-learning mechanism completely different to the ones performed
-by individuals which are mostly based on trial and error.
-• Notice that humans are able to learn because, in fact, we belong
-to a class of “computing machines” capable of doing so and that
-this ability is just the resuld of evolution.
-• Turing (1950) also noted the “obvious connection between
-machine learning and evolution”, envisioning the use of
-principles of evolution in the construction of thinking machines.
-• Evolutionay algorithms are a powerful alternative way to
-understand learning and they offer an alternative where classic
-techniques such as gradient descent or purely random search
-have proven unsatisfactory.
-• Genetic Algorithms (GA) are heuristic search techniques based
-on the principles of natural evolution which were enunciated by
-Darwin in The Origin of Species in 1859.
-• According to such principles, natural selection stablishes a link
-between the performance of the living beings and the
-chomosomes that encode their genetic information.
-• The process of natural selection has the result that chromosomes
-which encode successful characteristics to reproduce more
-frequently than those who do not.
-4
-• GA were fist proposed by Holland in 1962 but only after 1975
-with the publication of his book Adaptation in Natural and
-Artificial Systems they became relatively popular.
-• Other proposals such as Evolutionary Programming (Fogel et al,
-1966), Evolution Strategies (Rechenberg, 1971; Schewefel, 1974)
-or, more recently, Genetic Programming (Koza, 1992) share
-similar ideas consisting on applying principles of Evolution to the
-solution of general problems.
-• Similarly as with other ML techiniques such as ANNs, GAs are just
-algorithmic abstractions with few or no relationship with the real
-processes they emulate.
-5
-6
-• Notice that in all the algorithms previously seen, the modification of
-the solution is done directly.
-• Contrary to this, Evolution is a biological process that operates on
-the chromosomes rather than on their biological expression (the
-living beign they encode)
-• In contrast, GA operate on coded versions of the solutions, this is a
-paramount diference of GAs, one of its strenghts but also one of its
-drawbacks.
-• In effect, since encoding is so important, the performance of the
-algorith strongly depends on finding such ecoding that support
-easily the search procedures.
-• Encoding is, in the words of some practitioners, more an art than a
-science and it car reveal or destroy the power of GA.
-7
-• Another important diference of GA aganist more
-“clasical”
-procedures is that GA are inherently parallel.
-• Most of the algorithms try to find improved versions of an initial
-solution while GA search for a whole set of better solutions.
-• In this sense, GA implement not only a search in depth but also a
-search in breadth.
-• For GAs it is not essential to find, at some iteration, a solution that it
-is better than the previous one but to find one set of solutions
-which, globaly, are better than the preceeding.
-8
-• GA fall under the class of heuristic algorithms, even though some
-convergence results exist, it can not be generally demonstrated that
-they converge to the global (or even local) optimum.
-• Nevertheless they have show their flexibility and power in many
-applications that range from Finance to Electronics.
-• GA are also robust and accept post-optimality analyses in a natural
-fashion: when the objective function changes significant parts of the
-algorithms are reusable, in contrats with other methods that require
-a full re-writting of the procedures and code.
-• Finally, as we shall see, GA are non deterministic but stochastic, i.e.
-every time they are run on a particular problem they can provide
-different solutions
-• In its most basic form GA employ three operators: Selection,
-Crossover and Mutation.
-• These operators mimic the ones found in Genetics, which is also
-the source for many other operators: diplodism, parasitism,
-elitism, etc.
-• GA are conceptually very simple and can be better explained
-with a simple example taken from (Goldberg, 1996).
+Generative Adversarial Networks (GANs) are deep learning models
+that employ two networks: one of them tries to generate
+examples similar to a particular one and the other tries to
+discern whether the example is real or fake.
+• Similarly to VAEs, have two components but in this case we call
+them the generator and the discriminator.
+• The purpose of the generator is to create a set of samples, similar
+to the real ones, which are passed to the discriminator which tries
+to perform a classification between real and synthetically
+generated examples.
+• The magic idea of GANs is to force these two modules to
+compete between them, so that the generator will try to generate
+examples which are classified as “real” by the discriminator
+while the discriminator will try to improve its classification
+performance trying to minimize the number of
+misclassifications between real and fake examples.
+37
+thispersondoesnotexist.com
+• After training, when a particularly good generator is found, it can
+be used to generate synthetic examples that does not exist in real
+life.
+• See the following example:
+38
+• At the start, the generator just produces random examples
+without any hint of how a real example is.
+• On his side, the discriminator tries to determine which ones are
+real and which ones fake with the help, only at the start, of an
+external teacher.
+• The generator receives some score given by the discriminator
+that helps it to improve the generation of examples.
+• The goal of the generator is, then, to produce more realistic
+examples along time while the role of the discriminator is to be
+able to distinguish between real and fake images, a task that
+becomes more and more complicate as the generator improves
+its performance.
+• Note that the word “adversarial” clearly illustrates the
+competition between these two modules in GANs.
+39
+• The purpose of the discriminator is to calculate the probability
+that some example belongs to some particular class (Y) given its
+features (X), .i.e.:
+P(Y│X)
+• To learn such probability any machine learning model can be
+used but, generally, a neural network model is used.
+• This probability is passed to the generator, which now has an
+intuition of how good the generated example is.
+40
+• As mentioned, the goal of the generator is to create realistic
+examples of some class.
+• To do so, a neural network is employed, where the inputs of the
+network are random features, e, as well as the class that the
+example should belong to, Y, and the output are the features of
+the example, i.e.:
+�M = �(�)
+• The features �M (the generated example) are then passed through
+the discriminator, which tries to decide whether the example is
+real or fake.
+• Note that in this phase the discriminator is fed both with real
+and fake examples.
+41
+• The discriminator outputs some value using an appropriate loss
+function which compares the actual output �M (the predicted
+class) with the expected output Y (the actual class).
+• This loss g( �M, � ) is propagated backwards to update the
+parameters q of the generator which tries to improve the
+generated examples trying to minimize the error detected by the
+discriminator.
+• In GANs the most popular loss function is the binary crossentropy.
+42
+• Once the generator has achieved the desired performance, the
+parameters of the generator are fixed, and the generator can be
+used to create realistic examples by sampling from a noise
+distribution at the input.
+• Note that the generator, in contrast with the discriminator, is
+trying to model the conditional probability of features given
+some particular class:
+P(X│Y)
+• Which is exactly the inverse as the probability of the
+discriminator tries to model.
+• Note that the role of the discriminator is simpler, since it only
+has to output one label for the example while the generator has
+to output a usually high number of features that represent the
+fake example.
+43
+• Training a whole GAN involves two alternating phases: during
+the first one the discriminator is improved, while in the second
+one, the generator increases its performance.
+• As said, the generator creates a set of fake observations
+sampling from a noise distribution.
+• These examples are fed to the discriminator whose functioning
+fits exactly as a classical neural network: it receives examples and
+the classes (fake and real), calculates some loss function and
+backpropagates the errors adapting the weights, θd.
+• As we will see now, it is not necessary that predictions are
+perfect, and the purpose of this phase is just to improve the
+discriminating ability.
+44
+First phase
+The discriminator is trained using fake and real data
+45
+• The second phase consists of training the generator.
+• In this phase synthetic examples are created as before, and they
+are fed to the discriminator, in this phase no real examples are
+used.
+• After feeding the discriminator, the output is produced, since
+we want the generator to create only realistic examples, in the
+computation we assume that all the examples are real and
+compute the loss function for this single class.
+• This error is propagated back, but now to the generator which
+will modify the weights trying to maximize the loss function.
+46
+Second phase
+The generator is using only fake data passed to the discriminator
+47
+• Assume we call h(x(i)
+,q) the output of the network, where x(i) is
+the i example and q the parameters of the network.
+• Assume that y(i) is the expected output for example i, the binary
+cross entropy is computed as:
+• Note that the cost is computed along the whole training set (or 
+the training batch), with examples m. 
+• Note that whenever �(#) = log ℎ � #
+, � the loss for the example
+is zero, since the network has found the correct target.
+�(�) = − 1
+�)*�(,) log ℎ1�(,)
+, �4 + (1 − �(,)
+) log 61 − ℎ1�(,)
+, �478
+9
+,:;
+48
+• Note also that whenever �(#) = 0 the first part of the function
+�(#) log ℎ � #
+, � is zero and so the loss for the example is also
+zero, it will be a negative number whenever the prediction is
+different from zero.
+• When �(#) = 1 the second part of the function (1 − � # ) log /
+0
+1 −
+ℎ � #
+, � is zero and so the loss for the example is also zero, it
+will be a negative number when the prediction is different from
+one.
+• Viewed in this way, the second part of the equation is used to
+calculate errors when the real value is zero while the first part
+of the equation is used to calculate errors when the real value is
+one.
+49
+• The negative sign at the beginning of the equation transforms
+the negative numbers into positive ones, in consistency with the
+intuition of a cost function which needs to be minimized.
+• In what follows we will assume �(#) = 1 for real observations
+and �(#) = 0 for fake observations.
+• With this convention the first part of the equation measures
+how bad the discriminator is when classifying real observations
+(for which �(#) = 1 ) while the second part measures how bad it
+is for classifying fake observations produced by the generator
+(for which �(#) = 0 ).
+50
+• Now, returning to the tasks for each of the modules, note that
+the objective of the discriminator is to make the loss function
+as small as possible, since this would mean that it misclassifies
+few examples.
+• Contrary to that, the objective of the generator is to make this
+function the highest since it wants the discriminator to take as
+real all the fake examples it produces.
+• Also note that in the case of the generator, all the examples
+that are passed to the discriminator are fake, so that only the
+second part of the above equation plays a role.
+51
+• Since both of the modules are antagonistic, the problem can be
+seen as a minimax problem in Game Theory where two agents
+have adversarial objectives.
+• It can be proved that learning essentially consists on finding a
+Nash equilibrium where both the generator and the
+discriminator implement a best response to the actions of the
+other.
+52
+• Re-writing the above equation, the problem which needs to be
+solved is:
+where E is the mathematical expectation.
+• It is important to understand that when we are training the
+models, the performance of the discriminator and the
+generator should be comparable.
+• Otherwise, if we had, for example, a discriminator which
+perfectly predicts all the fake examples it would be impossible
+for the generator to improve.
+• Nevertheless, the basic structure shown has some problems
+particularly what is called the mode collapse as well as the
+previously mentioned of vanishing gradients.
+min
+$
+max
+' −)�(log/�(�)3 + � (1 − log (�(�(�))9
+53
+• Mode collapse happens when the generator gets stuck in
+generating one particular example that efficiently fools the
+discriminator, but it is unable to create other examples that do
+so.
+• In some sense, the generator learns a “trick” that works for
+fooling the discriminator and employs it again and again.
+• Regarding vanishing gradients, since the loss functions used
+(binary cross entropy) has an s-shape some areas of the
+function (the extremes) show little variation when the output
+changes, this means that the gradient would be close to zero, so
+that learning would eventually slow or even stop.
+Ñ » g 0
+Ñ » g 0
+54
+• As an alternative, and to avoid vanishing gradients, it has been
+proposed to use another loss function called Earth´s Mover
+Distance (EMD).
+• The EMD measures the amount of effort to transform one
+distribution into another.
+• One may think as moving one pile of sand to replicate another
+pile of sand.
+• The EMD considers both distance and amount of frequency
+moved, similarly as in the real world.
+• The EMD is not bounded, avoiding the problem of the BCE
+which is bounded between zero and one and suffers from the
+vanishing gradients problem.
+55
+• Since Binary Cross Entropy (BCE) suffers the problems of
+mode collapse and vanishing gradients it does not seem an optimal
+loss function in the current case.
+• One alternative is to use the Wasserstein loss (W-loss hereafter):
+• Note that the expression is very similar to the BCE with a
+couple of changes.
+• The first one is purely notational since the discriminator (d) is
+replaced by a critic (c).
+• The second one is that the two expectations are subtracted, not
+added.
+• The interpretation of this is that the role of the generator is to
+separate as much as possible the distributions of the real
+examples and the fake ones, since this allows to discriminate
+better between them.
+!�($�(�)( −� (�(�(�))-
+56
+• On an opposite side, the role of the generator is to make them
+as close as possible, since this would mean that the
+discriminator is unable to distinguish real from fake examples.
+The problem then becomes:
+• Since the output of the second network can be now
+unbounded, we can use linear functions instead of a sigmoid
+one at the output.
+• Also, since the second network gives some unbounded grade of
+“fakeness” the name “discriminator” can be changed by “critic”
+which gives an intuitive idea of its behavior.
+min
+�
+max
+� (�*�(�). − �(�(�(�))1
+57
+• To implement the W-loss function one needs to impose that the
+critic must to be 1-Lipschitz continuous which means that the
+gradient should be at most equal to one in any point of the
+error surface.
+• This condition could be ensured by “clipping” the weights of
+the critic network so that the overall gradient is not higher than
+one.
+• The problem with this procedure is that we would be
+constraining the search space of the weights so that it would
+be difficult to find a set of weights that effectively optimizes
+the loss.
+58
+• An alternative is to employ a regularization term for the
+gradient of the critic (in a similar vein as the regularization of
+the weights of a model to avoid overfitting).
+• This can be implemented by including a regularization term to
+ensure that ǁ∇c(x)ǁ≤1.
+• One additional problem is that, since we have to ensure that
+this happens for any x, it would be needed to sample the whole
+feature space.
+• To overcome this problem an interpolated version of a real (x)
+and fake example, g(z), is used:
+ηx+(1-η)g(z)
+where η is any random number.
+59
+• Now, with the W-loss function penalized to ensure Lipschitz
+continuity is:
+min
+%
+max
+&
+� � � − �(�(� � ) + ��( ∇� � − 1)'
+The above function is the one to be optimized.
+60
+• One issue that we have not considered up to now is that fake
+examples are generated without any restriction, i.e. they are
+generated without explicitly assuming any particular class.
+• In some applications it is required that examples come from a
+particular class given a set of possible classes (for example,
+male vs. female), the models that allow to do this are called
+Conditional GANs.
+• In a conditional GAN it is required that the class be passed
+both to the generator and the discriminator.
+61
+• Regarding the generator, now two vectors are needed, one is
+the usual vector of random elements while the other is a one-hot
+vector for the classes.
+• Both vectors are concatenated and passed to the generator
+network.
+• The discriminator also receives this concatenated vector.
+• If the input presented does not belong to the input class then
+the discriminator will label it as fake.
+62
+• Another possibility is to control the features that fake generated
+examples must have instead of controlling the class, this is called
+controllable generation in contrast with conditional generation.
+• In some sense, this is possibility more accurate in the sense that a
+higher granularity is achived.
+• Another difference between these two ways of generating fake
+examples is that in controllable generation you do not need to
+specify the class to which the example belongs, so that it is
+possible to use this method after the model has been trained.
+• To implement controllable generation we need to alter some of
+the input features of the random vector that it is used to generate
+the examples (in a similar fashion as the DNA).
+63
+• Two problems arise when features are changed to generate
+examples with specific characteristics:
+• The first one is that there may exist correlation among the
+characteristics so that changing one of the features it may
+affect two or more instead of only the characteristic of
+interest.
+• The second problem is called z-space entanglement and means
+that features of the examples are encoded in several
+characteristics of the input space. This happens because the
+mapping between characteristics and features is not a oneto-one application and it is generally due to the fact that the
+space of characteristics of the input has a low dimension
+compared to the encoded features.
+64
+• The simplest way to modify the characteristics in the input, so
+that the generated example has the required feature is to use
+some pre-trained classifier that detects whether the example has
+such feature.
+• The output of the classifier is passed back to the generator to
+modify the characteristics until the pre-trained classifier detects
+that the feature is found.
+• Regarding disentangling the z-space we can use a number of
+supervised and unsupervised techniques.
+• Regarding it applications, GANs have been primarily used in
+the context of images and video and as mentioned before.

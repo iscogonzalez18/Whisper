@@ -1,5 +1,7 @@
 import openai
 
+import time
+
 import nltk
 
 # colores en el print
@@ -27,7 +29,7 @@ def read_article(file_name):
     file = open("/home/kali/github/Whisper/textos/" + file_name, "r")
     filedata = file.read()
     # print(filedata,"\n")
-    return filedata.split(". "),numeroTokens(filedata)
+    return filedata.split("."),numeroTokens(filedata)
 
 # devuelve el numero de palabras de un texto
 def numeroTokens(texto):
@@ -36,13 +38,108 @@ def numeroTokens(texto):
     
 def getResusmenResumido(file_name, tamañoResumenFinal, palabrasParrafo, tokensMaxModelo):
     sentences, tokensTotales = read_article(file_name)
+    sentences = filtrarFrases(sentences)
     print("Numero de tokens totales:", tokensTotales)
     print("Numero de frases:", len(sentences))
 
+    pasadasAcotadas = False
+
     if tamañoResumenFinal == 'mitad':
         tamañoResumenFinal = int(tokensTotales/2)
+    elif tamañoResumenFinal == 'masmitad':
+        tamañoResumenFinal = int(tokensTotales*(2/3))
+    elif tamañoResumenFinal == 'extenso':
+        tamañoResumenFinal = tokensTotales
+    elif tamañoResumenFinal == int(tamañoResumenFinal):
+        print(Fore.GREEN, "Número de pasadas:", tamañoResumenFinal, Style.RESET_ALL)
+        pasadasAcotadas = True
+    else:
+        print(Fore.RED, "Error en el tamaño del resumen final", Style.RESET_ALL)
+        return
 
-    parrafos = getParrafos(sentences, palabrasParrafo)
+    parrafos = getParrafos(sentences, palabrasParrafo, True)
+
+    vecesResumidas = 0
+
+    # stop por pasadas o por tamaño del resumen
+    if pasadasAcotadas:
+        stop = 2*tamañoResumenFinal
+    else:
+        stop = tamañoResumenFinal + 1
+
+    while stop > tamañoResumenFinal:
+        tamañoResumenes = 0
+        vecesResumidas += 1
+        resumenes = []
+        for parrafo in parrafos:
+            # prompt = "Sintetizame en " + str(int(len(parrafo.split())*(2/3))) + " o menos esto: " + parrafo
+            prompt = "Resumen extenso de esto: " + parrafo
+            # print("Prompt:", prompt)
+            tokensPrompt = int((len(prompt.split())*2000)/1500)
+            maxTokens = tokensMaxModelo - tokensPrompt
+            tamañoResumen = 0
+            i = 1
+            while tamañoResumen == 0:
+                response = chat(prompt, maxTokens)
+                resumen = response["choices"][0]["text"]
+                # print(response)
+                tamañoResumen = len(resumen.split())
+                if i >= 2 and tamañoResumen == 0:
+                    print(Fore.RED, "Esperando para resumir el parrafo:", i, Style.RESET_ALL)
+                    # esperamos 15 segundos para volver a resumir
+                    time.sleep(15)
+                    print(Fore.RED, "Volviendo a resumir el parrafo:", i, Style.RESET_ALL)
+                i += 1          
+            # print("Resumen:", resumen)
+            resumenes.append(resumen)     
+            tamañoResumenes += tamañoResumen
+            print("Tamaño del resumen:", tamañoResumen)
+
+        print(Fore.GREEN, "Tamaño de los resumenes:", tamañoResumenes, Style.RESET_ALL)
+        parrafos = getParrafos(resumenes, palabrasParrafo, False)
+
+        # stop por pasadas o por tamaño del resumen
+        if pasadasAcotadas:
+            stop -= 1
+        else:
+            stop = tamañoResumenes
+
+    print("Numero de veces resumidas:", vecesResumidas)
+    return parrafos
+
+def filtrarFrases(sentences):
+    # filtramos las frases que tengan menos de 6 palabras
+    sentencesCopy = []
+    for sentence in sentences:
+        if len(sentence.split()) > 6:
+            sentencesCopy.append(sentence)
+    return sentencesCopy
+
+# devuelve un array con los parrafos
+def getParrafos(sentences, palabrasParrafo, sinpunto):
+    parrafos = []
+    parrafo = ""
+    i = 0
+    # variable boolena para inidcar que los parrafos son de la ia y no meter puntos al final
+    if sinpunto:
+        for sentence in sentences:
+            if sentence == sentences[0]:
+                parrafos.append(sentence + ". ")
+            elif len(parrafos[i].split()) < palabrasParrafo:
+                parrafos[i] += sentence + ". "
+            else:
+                parrafos.append(sentence + ". ")
+                i += 1
+    else:
+        for sentence in sentences:
+            if sentence == sentences[0]:
+                parrafos.append(sentence)
+            elif len(parrafos[i].split()) < palabrasParrafo:
+                parrafos[i] += sentence
+            else:
+                parrafos.append(sentence)
+                i += 1
+
     print("Numero de parrafos:", len(parrafos))
     tamañoFrases = []
     for sentence in sentences:
@@ -52,50 +149,12 @@ def getResusmenResumido(file_name, tamañoResumenFinal, palabrasParrafo, tokensM
     for parrafo in parrafos:
         tamañoParrafos.append(len(parrafo.split()))
     print("Tamaño de parrafos:", tamañoParrafos)
-    
-    vecesResumidas = 0
-    tamañoResumenes = tamañoResumenFinal + 1
-    while tamañoResumenes > tamañoResumenFinal:
-        tamañoResumenes = 0
-        vecesResumidas += 1
-        resumenes = []
-        for parrafo in parrafos:
-            prompt = "Sintetizame esto: " + parrafo
-            # print("Prompt:", prompt)
-            tokensPrompt = int((len(prompt.split())*2000)/1500)
-            maxTokens = tokensMaxModelo - tokensPrompt
-            response = chat(prompt, maxTokens)
-            resumen = response["choices"][0]["text"]
-            # print(response)
-            # print("Resumen:", resumen)
-            resumenes.append(resumen)
-            tamañoResumen = len(resumen.split())
-            tamañoResumenes += tamañoResumen
-            print("Tamaño del resumen:", tamañoResumen)
-        print(Fore.GREEN, "Tamaño de los resumenes:", tamañoResumenes, Style.RESET_ALL)
-        parrafos = getParrafos(resumenes, palabrasParrafo)
-    print("Numero de veces resumidas:", vecesResumidas)
-    return parrafos
-
-# devuelve un array con los parrafos
-def getParrafos(sentences, palabrasParrafo):
-    parrafos = []
-    parrafo = ""
-    i = 0
-    for sentence in sentences:
-        if sentence == sentences[0]:
-            parrafos.append(sentence + ". ")
-        elif len(parrafos[i].split()) < palabrasParrafo:
-            parrafos[i] += sentence + ". "
-        else:
-            parrafos.append(sentence + ". ")
-            i += 1
     return parrafos
 
 
 # palabras que recibe chatgpt = entre 1900 y 2000 para recibir respuesta de 1000 mas o menos
-# texto, tamañoResumen, palabrasParrafo, tokensMaxModelo
-resumenResumido = getResusmenResumido("marianTexto.txt", 'mitad',  700, 3250)
+# texto, tamañoResumen(mitad(1/2), masmitad(2/3), extenso(3/3)), palabrasParrafo, tokensMaxModelo
+resumenResumido = getResusmenResumido("PRUEBA.txt", 2,  600, 3250)
 for resumen in resumenResumido:
     print(resumen)
 
