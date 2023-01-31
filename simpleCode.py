@@ -1,24 +1,24 @@
 
 import whisper
 
-naudio = "audio.mp3"
+naudio = "GP-Tema-1p1.mp3"
+language_whisper = "Spanish"
+model = whisper.load_model("small")
 
-model = whisper.load_model("base")
-# cambiamos el idioma a español
-model.set_language("es")
-# cambiamos el idioma a inglés
-# model.set_language("en")
-result = model.transcribe("/home/kali/github/Whisper/audios/" + naudio)
-print(result["text"])
+# Set options
+options = dict(language=language_whisper)
+transcribe_options = dict(task="transcribe", **options)
+
+result = model.transcribe("/home/kali/github/Whisper/audios/" + naudio, **transcribe_options)["text"]
 
 # print the recognized text
-nfile = "marianTexto.txt"
+nfile = "GP-Tema-1p1.txt"
 
 file = open("/home/kali/github/Whisper/textos/" + nfile, "w")
 print("file created\n")
 
 # escribimos todo el texto en un archivo con la funcion write
-file.writelines(result["text"])
+file.writelines(result)
 print("audio printed in " + nfile + "\n")
 
 file.close()
