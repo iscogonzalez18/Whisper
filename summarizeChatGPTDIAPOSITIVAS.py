@@ -24,12 +24,12 @@ def chat(prompt, maxTokens):
     )
     return response
 
-# lee un archivo y devuelve un array con las frases
+# lee un archivo y devuelve un array con las diapositivas
 def read_article(file_name):
     file = open("/home/kali/github/Whisper/textos/" + file_name, "r")
     filedata = file.read()
     # print(filedata,"\n")
-    return filedata.split("."),numeroTokens(filedata)
+    return filedata.split("1.3"),numeroTokens(filedata)
 
 # devuelve el numero de palabras de un texto
 def numeroTokens(texto):
@@ -37,10 +37,10 @@ def numeroTokens(texto):
     return len(palabras)
     
 def getResusmenResumido(file_name, tamañoResumenFinal, palabrasParrafo, tokensMaxModelo):
-    sentences, tokensTotales = read_article(file_name)
-    sentences = filtrarFrases(sentences)
+    diapositivas, tokensTotales = read_article(file_name)
+    diapositivas = filtrarFrases(diapositivas)
     print("Numero de tokens totales:", tokensTotales)
-    print("Numero de frases:", len(sentences))
+    print("Numero de diapositivas:", len(diapositivas))
 
     pasadasAcotadas = False
 
@@ -57,7 +57,7 @@ def getResusmenResumido(file_name, tamañoResumenFinal, palabrasParrafo, tokensM
         print(Fore.RED, "Error en el tamaño del resumen final", Style.RESET_ALL)
         return
 
-    parrafos = getParrafos(sentences, palabrasParrafo, True)
+    parrafos = getParrafos(diapositivas, palabrasParrafo, True)
 
     vecesResumidas = 0
 
@@ -73,7 +73,7 @@ def getResusmenResumido(file_name, tamañoResumenFinal, palabrasParrafo, tokensM
         resumenes = []
         for parrafo in parrafos:
             # prompt = "Sintetizame en " + str(int(len(parrafo.split())*(2/3))) + " o menos esto: " + parrafo
-            prompt = "Resumen extenso de esto: " + parrafo
+            prompt = "Sintatizame las siguientes diapositivas: " + parrafo
             # print("Prompt:", prompt)
             tokensPrompt = int((len(prompt.split())*2000)/1500)
             maxTokens = tokensMaxModelo - tokensPrompt
@@ -154,7 +154,7 @@ def getParrafos(sentences, palabrasParrafo, sinpunto):
 
 # palabras que recibe chatgpt = entre 1900 y 2000 para recibir respuesta de 1000 mas o menos
 # texto, tamañoResumen(mitad(1/2), masmitad(2/3), extenso(3/3)), palabrasParrafo, tokensMaxModelo
-resumenResumido = getResusmenResumido("PRUEBA.txt", 1,  600, 3250)
+resumenResumido = getResusmenResumido("PRUEBA.txt", 1,  350, 3500)
 for resumen in resumenResumido:
     print(resumen)
 

@@ -1,344 +1,558 @@
-Generative Adversarial Networks (GANs) are deep learning models
-that employ two networks: one of them tries to generate
-examples similar to a particular one and the other tries to
-discern whether the example is real or fake.
-• Similarly to VAEs, have two components but in this case we call
-them the generator and the discriminator.
-• The purpose of the generator is to create a set of samples, similar
-to the real ones, which are passed to the discriminator which tries
-to perform a classification between real and synthetically
-generated examples.
-• The magic idea of GANs is to force these two modules to
-compete between them, so that the generator will try to generate
-examples which are classified as “real” by the discriminator
-while the discriminator will try to improve its classification
-performance trying to minimize the number of
-misclassifications between real and fake examples.
-37
-thispersondoesnotexist.com
-• After training, when a particularly good generator is found, it can
-be used to generate synthetic examples that does not exist in real
-life.
-• See the following example:
-38
-• At the start, the generator just produces random examples
-without any hint of how a real example is.
-• On his side, the discriminator tries to determine which ones are
-real and which ones fake with the help, only at the start, of an
-external teacher.
-• The generator receives some score given by the discriminator
-that helps it to improve the generation of examples.
-• The goal of the generator is, then, to produce more realistic
-examples along time while the role of the discriminator is to be
-able to distinguish between real and fake images, a task that
-becomes more and more complicate as the generator improves
-its performance.
-• Note that the word “adversarial” clearly illustrates the
-competition between these two modules in GANs.
-39
-• The purpose of the discriminator is to calculate the probability
-that some example belongs to some particular class (Y) given its
-features (X), .i.e.:
-P(Y│X)
-• To learn such probability any machine learning model can be
-used but, generally, a neural network model is used.
-• This probability is passed to the generator, which now has an
-intuition of how good the generated example is.
-40
-• As mentioned, the goal of the generator is to create realistic
-examples of some class.
-• To do so, a neural network is employed, where the inputs of the
-network are random features, e, as well as the class that the
-example should belong to, Y, and the output are the features of
-the example, i.e.:
-�M = �(�)
-• The features �M (the generated example) are then passed through
-the discriminator, which tries to decide whether the example is
-real or fake.
-• Note that in this phase the discriminator is fed both with real
-and fake examples.
-41
-• The discriminator outputs some value using an appropriate loss
-function which compares the actual output �M (the predicted
-class) with the expected output Y (the actual class).
-• This loss g( �M, � ) is propagated backwards to update the
-parameters q of the generator which tries to improve the
-generated examples trying to minimize the error detected by the
-discriminator.
-• In GANs the most popular loss function is the binary crossentropy.
-42
-• Once the generator has achieved the desired performance, the
-parameters of the generator are fixed, and the generator can be
-used to create realistic examples by sampling from a noise
-distribution at the input.
-• Note that the generator, in contrast with the discriminator, is
-trying to model the conditional probability of features given
-some particular class:
-P(X│Y)
-• Which is exactly the inverse as the probability of the
-discriminator tries to model.
-• Note that the role of the discriminator is simpler, since it only
-has to output one label for the example while the generator has
-to output a usually high number of features that represent the
-fake example.
-43
-• Training a whole GAN involves two alternating phases: during
-the first one the discriminator is improved, while in the second
-one, the generator increases its performance.
-• As said, the generator creates a set of fake observations
-sampling from a noise distribution.
-• These examples are fed to the discriminator whose functioning
-fits exactly as a classical neural network: it receives examples and
-the classes (fake and real), calculates some loss function and
-backpropagates the errors adapting the weights, θd.
-• As we will see now, it is not necessary that predictions are
-perfect, and the purpose of this phase is just to improve the
-discriminating ability.
-44
-First phase
-The discriminator is trained using fake and real data
-45
-• The second phase consists of training the generator.
-• In this phase synthetic examples are created as before, and they
-are fed to the discriminator, in this phase no real examples are
-used.
-• After feeding the discriminator, the output is produced, since
-we want the generator to create only realistic examples, in the
-computation we assume that all the examples are real and
-compute the loss function for this single class.
-• This error is propagated back, but now to the generator which
-will modify the weights trying to maximize the loss function.
-46
-Second phase
-The generator is using only fake data passed to the discriminator
-47
-• Assume we call h(x(i)
-,q) the output of the network, where x(i) is
-the i example and q the parameters of the network.
-• Assume that y(i) is the expected output for example i, the binary
-cross entropy is computed as:
-• Note that the cost is computed along the whole training set (or 
-the training batch), with examples m. 
-• Note that whenever �(#) = log ℎ � #
-, � the loss for the example
-is zero, since the network has found the correct target.
-�(�) = − 1
-�)*�(,) log ℎ1�(,)
-, �4 + (1 − �(,)
-) log 61 − ℎ1�(,)
-, �478
-9
-,:;
-48
-• Note also that whenever �(#) = 0 the first part of the function
-�(#) log ℎ � #
-, � is zero and so the loss for the example is also
-zero, it will be a negative number whenever the prediction is
-different from zero.
-• When �(#) = 1 the second part of the function (1 − � # ) log /
-0
-1 −
-ℎ � #
-, � is zero and so the loss for the example is also zero, it
-will be a negative number when the prediction is different from
-one.
-• Viewed in this way, the second part of the equation is used to
-calculate errors when the real value is zero while the first part
-of the equation is used to calculate errors when the real value is
-one.
-49
-• The negative sign at the beginning of the equation transforms
-the negative numbers into positive ones, in consistency with the
-intuition of a cost function which needs to be minimized.
-• In what follows we will assume �(#) = 1 for real observations
-and �(#) = 0 for fake observations.
-• With this convention the first part of the equation measures
-how bad the discriminator is when classifying real observations
-(for which �(#) = 1 ) while the second part measures how bad it
-is for classifying fake observations produced by the generator
-(for which �(#) = 0 ).
-50
-• Now, returning to the tasks for each of the modules, note that
-the objective of the discriminator is to make the loss function
-as small as possible, since this would mean that it misclassifies
-few examples.
-• Contrary to that, the objective of the generator is to make this
-function the highest since it wants the discriminator to take as
-real all the fake examples it produces.
-• Also note that in the case of the generator, all the examples
-that are passed to the discriminator are fake, so that only the
-second part of the above equation plays a role.
-51
-• Since both of the modules are antagonistic, the problem can be
-seen as a minimax problem in Game Theory where two agents
-have adversarial objectives.
-• It can be proved that learning essentially consists on finding a
-Nash equilibrium where both the generator and the
-discriminator implement a best response to the actions of the
-other.
-52
-• Re-writing the above equation, the problem which needs to be
-solved is:
-where E is the mathematical expectation.
-• It is important to understand that when we are training the
-models, the performance of the discriminator and the
-generator should be comparable.
-• Otherwise, if we had, for example, a discriminator which
-perfectly predicts all the fake examples it would be impossible
-for the generator to improve.
-• Nevertheless, the basic structure shown has some problems
-particularly what is called the mode collapse as well as the
-previously mentioned of vanishing gradients.
-min
-$
-max
-' −)�(log/�(�)3 + � (1 − log (�(�(�))9
-53
-• Mode collapse happens when the generator gets stuck in
-generating one particular example that efficiently fools the
-discriminator, but it is unable to create other examples that do
-so.
-• In some sense, the generator learns a “trick” that works for
-fooling the discriminator and employs it again and again.
-• Regarding vanishing gradients, since the loss functions used
-(binary cross entropy) has an s-shape some areas of the
-function (the extremes) show little variation when the output
-changes, this means that the gradient would be close to zero, so
-that learning would eventually slow or even stop.
-Ñ » g 0
-Ñ » g 0
-54
-• As an alternative, and to avoid vanishing gradients, it has been
-proposed to use another loss function called Earth´s Mover
-Distance (EMD).
-• The EMD measures the amount of effort to transform one
-distribution into another.
-• One may think as moving one pile of sand to replicate another
-pile of sand.
-• The EMD considers both distance and amount of frequency
-moved, similarly as in the real world.
-• The EMD is not bounded, avoiding the problem of the BCE
-which is bounded between zero and one and suffers from the
-vanishing gradients problem.
-55
-• Since Binary Cross Entropy (BCE) suffers the problems of
-mode collapse and vanishing gradients it does not seem an optimal
-loss function in the current case.
-• One alternative is to use the Wasserstein loss (W-loss hereafter):
-• Note that the expression is very similar to the BCE with a
-couple of changes.
-• The first one is purely notational since the discriminator (d) is
-replaced by a critic (c).
-• The second one is that the two expectations are subtracted, not
-added.
-• The interpretation of this is that the role of the generator is to
-separate as much as possible the distributions of the real
-examples and the fake ones, since this allows to discriminate
-better between them.
-!�($�(�)( −� (�(�(�))-
-56
-• On an opposite side, the role of the generator is to make them
-as close as possible, since this would mean that the
-discriminator is unable to distinguish real from fake examples.
-The problem then becomes:
-• Since the output of the second network can be now
-unbounded, we can use linear functions instead of a sigmoid
-one at the output.
-• Also, since the second network gives some unbounded grade of
-“fakeness” the name “discriminator” can be changed by “critic”
-which gives an intuitive idea of its behavior.
-min
-�
-max
-� (�*�(�). − �(�(�(�))1
-57
-• To implement the W-loss function one needs to impose that the
-critic must to be 1-Lipschitz continuous which means that the
-gradient should be at most equal to one in any point of the
-error surface.
-• This condition could be ensured by “clipping” the weights of
-the critic network so that the overall gradient is not higher than
-one.
-• The problem with this procedure is that we would be
-constraining the search space of the weights so that it would
-be difficult to find a set of weights that effectively optimizes
-the loss.
-58
-• An alternative is to employ a regularization term for the
-gradient of the critic (in a similar vein as the regularization of
-the weights of a model to avoid overfitting).
-• This can be implemented by including a regularization term to
-ensure that ǁ∇c(x)ǁ≤1.
-• One additional problem is that, since we have to ensure that
-this happens for any x, it would be needed to sample the whole
-feature space.
-• To overcome this problem an interpolated version of a real (x)
-and fake example, g(z), is used:
-ηx+(1-η)g(z)
-where η is any random number.
-59
-• Now, with the W-loss function penalized to ensure Lipschitz
-continuity is:
-min
-%
-max
-&
-� � � − �(�(� � ) + ��( ∇� � − 1)'
-The above function is the one to be optimized.
-60
-• One issue that we have not considered up to now is that fake
-examples are generated without any restriction, i.e. they are
-generated without explicitly assuming any particular class.
-• In some applications it is required that examples come from a
-particular class given a set of possible classes (for example,
-male vs. female), the models that allow to do this are called
-Conditional GANs.
-• In a conditional GAN it is required that the class be passed
-both to the generator and the discriminator.
-61
-• Regarding the generator, now two vectors are needed, one is
-the usual vector of random elements while the other is a one-hot
-vector for the classes.
-• Both vectors are concatenated and passed to the generator
-network.
-• The discriminator also receives this concatenated vector.
-• If the input presented does not belong to the input class then
-the discriminator will label it as fake.
-62
-• Another possibility is to control the features that fake generated
-examples must have instead of controlling the class, this is called
-controllable generation in contrast with conditional generation.
-• In some sense, this is possibility more accurate in the sense that a
-higher granularity is achived.
-• Another difference between these two ways of generating fake
-examples is that in controllable generation you do not need to
-specify the class to which the example belongs, so that it is
-possible to use this method after the model has been trained.
-• To implement controllable generation we need to alter some of
-the input features of the random vector that it is used to generate
-the examples (in a similar fashion as the DNA).
-63
-• Two problems arise when features are changed to generate
-examples with specific characteristics:
-• The first one is that there may exist correlation among the
-characteristics so that changing one of the features it may
-affect two or more instead of only the characteristic of
-interest.
-• The second problem is called z-space entanglement and means
-that features of the examples are encoded in several
-characteristics of the input space. This happens because the
-mapping between characteristics and features is not a oneto-one application and it is generally due to the fact that the
-space of characteristics of the input has a low dimension
-compared to the encoded features.
-64
-• The simplest way to modify the characteristics in the input, so
-that the generated example has the required feature is to use
-some pre-trained classifier that detects whether the example has
-such feature.
-• The output of the classifier is passed back to the generator to
-modify the characteristics until the pre-trained classifier detects
-that the feature is found.
-• Regarding disentangling the z-space we can use a number of
-supervised and unsupervised techniques.
-• Regarding it applications, GANs have been primarily used in
-the context of images and video and as mentioned before.
+3. Metodologías de 
+gestión de proyectos
+Gestión de proyectos
+Tema 1. Fundamentos
+Curso 2021-2022
+Grado en Ingeniería Informática. 3er curso
+1.3. - 2
+Metodologías
+• Métrica V3
+▫ Metodología de Planificación, Desarrollo y Mantenimiento de Sistemas 
+de Información patrocinada por el gobierno de España. 
+▫ Basada en el modelo de procesos del ciclo de vida de desarrollo 
+ISO/IEC 12207 (Information Technology - Software Life Cycle
+Processes) y en la norma ISO/IEC 15504 SPICE (Software Process
+Improvement And Assurance Standards Capability Determination). 
+• PMBOK 
+▫ Estándar en la gestión de proyectos desarrollado por el Project 
+Management Institute (PMI).
+▫ PMBOK identifica el subconjunto de fundamentos de gestión de 
+proyectos que es "generalmente reconocido" como una "buena 
+práctica". 
+1.3. - 3
+• Alternativas. En este contexto se refiere a cada uno de los posibles modelos de 
+implementación de la arquitectura del sistema (los distintos elementos hardware 
+en los que incorporar el sistema).
+• Arquitectura de información. Colección de documentos formada por el modelo 
+de información, el modelo de sistemas de información y la arquitectura 
+tecnológica.
+• Arquitectura tecnológica. Cada una de las posibles plataformas sobre las que 
+se puede desarrollar un sistema de información: Mainframe, Linux sobre PC, 
+Windows sobre PC, etcétera.
+• Catálogo de objetivos. Relación de objetivos que se pretende alcanzar en cada 
+proceso del sistema de información.
+• Catálogo de requisitos. Relación de requisitos y restricciones impuestos al 
+sistema por el cliente/usuario y la tecnología disponible.
+• Factores críticos de éxito. Recursos humanos, materiales y/o formas de hacer 
+(know-how) facilitados al equipo de desarrollo para terminar de forma adecuada 
+un proyecto.
+Métrica V3: Conceptos básicos
+1.3. - 4
+• Modelo. Representación de una realidad para facilitar el manejo de un problema.
+• Modelo de información. Recoge qué se pretende almacenar en el sistema.
+• Modelo de sistemas de información. Incluye qué se hace, qué se necesita y de 
+qué tecnología se dispone para gestionar un sistema de información
+• Plan de acción. Relación que incluye los proyectos y acciones a desarrollar para 
+la implantación de los modelos que constituyen la arquitectura de la información.
+• Plan de mantenimiento del PSI. Relación de las acciones necesarias que deben 
+realizarse para que la documentación del PSI esté actualizada.
+• Plan de proyectos. Relación de los proyectos a desarrollar por un equipo de 
+desarrollo de modo que se haya definido cada proyecto en los que se trabaja, su 
+prioridad, su calendario y los recursos disponibles para su realización 
+• Plan de Sistemas de Información (PSI). Se obtiene información sobre los 
+sistemas de información implantados en la empresa, se evalúan las nuevas 
+necesidades de funcionalidades y se definen proyectos para su mejora.
+• Plan de trabajo. Relación de recursos materiales y humanos, tareas y calendario 
+que permite el desarrollo de un proyecto.
+Métrica V3: Conceptos básicos
+1.3. - 5
+Estructura de Métrica V3
+1.3. - 6
+Estructura de Métrica V3
+1.3. - 7
+Métrica V3 - Gestión de proyectos
+• La Gestión de Proyectos tiene como finalidad principal la planificación, 
+el seguimiento y control de las actividades y de los recursos
+humanos y materiales que intervienen en el desarrollo de un Sistema 
+de Información.
+• Como consecuencia de este control es posible conocer en todo 
+momento qué problemas se producen y resolverlos o paliarlos de 
+manera inmediata. 
+• La Interfaz de Gestión de Proyectos de MÉTRICA Versión 3 contempla 
+proyectos de desarrollo de Sistemas de Información en sentido 
+amplio.
+• EUROMÉTODO (metodología europea para la adquisición de sistemas 
+de información y servicios relacionados) considera proyectos de 
+desarrollo de nuevos Sistemas de Información y también los 
+proyectos de ampliación y mejora de los ya existentes. 
+1.3. - 8
+Métrica V3 – Proceso
+• Las actividades de la Interfaz de Gestión de Proyectos 
+se presentan en el siguiente esquema, en el que se 
+aprecian las áreas que cubre. Se distinguen tres grupos de 
+actividades:
+▫ Actividades de Inicio del Proyecto (GPI).
+▫ Actividades de Seguimiento y Control (GPS).
+▫ Actividades de Finalización del Proyecto (GPF). 
+1.3. - 9
+Métrica V3 – Proceso
+• El desarrollo en Métrica V3 lo constituyen los procesos:
+▫ ESTUDIO DE VIABILIDAD DEL SISTEMA (EVS)
+▫ ANÁLISIS DEL SISTEMA DE INFORMACIÓN (ASI)
+▫ DISEÑO DEL SISTEMA DE INFORMACIÓN (DSI)
+▫ CONSTRUCCIÓN DEL SISTEMA DE INFORMACIÓN (CSI)
+▫ IMPLANTACIÓN Y ACEPTACIÓN DEL SISTEMA (IAS)
+1.3. - 10
+Métrica V3 – Actividades
+• Actividades de Inicio del Proyecto (GPI). Al principio del proyecto, al 
+concluir el proceso Estudio de Viabilidad del Sistema, se realizarán las 
+actividades de Estimación de Esfuerzo y Planificación del proyecto.
+• Actividades de Seguimiento y Control (GPS). Comprenden desde la 
+asignación de las tareas hasta su aceptación por parte del equipo de 
+proyecto, incluyendo la gestión de incidencias y cambios en los 
+requisitos. El Seguimiento y Control del proyecto se realizan durante los 
+procesos de Análisis, Diseño, Construcción, Implantación y 
+Aceptación, y Mantenimiento del Sistema de Información, para 
+vigilar el correcto desarrollo de las actividades y tareas establecidas en 
+la planificación.
+• Actividades de Finalización del Proyecto (GPF). Por último, al 
+concluir el proyecto se realizan las tareas propias de Cierre del 
+Proyecto y Registro de la Documentación de Gestión.
+1.3. - 11
+Métrica V3 – GPI (Inicio del Proyecto) 
+• Tienen un doble objetivo: estimar el esfuerzo a realizar 
+para desarrollar el sistema y planificar las actividades de 
+dicho desarrollo.
+• Para ello, toman como punto de partida la Solución 
+Propuesta en el EVS (Estudio de Viabilidad del Sistema)
+• Se identifican los elementos a desarrollar, se calcula el 
+esfuerzo a realizar, y se planifican las actividades.
+1.3. - 12
+• Estimación
+Métrica V3 – GPI (Inicio del Proyecto) 
+1.3. - 13
+• Planificación
+Métrica V3 – GPI (Inicio del Proyecto) 
+1.3. - 14
+Métrica V3 – GPS (Seguimiento y Control) 
+• Objetivo: Vigilar las actividades de desarrollo del sistema.
+• Para ello busca desviaciones (retrasos), para analizar sus 
+causas y realizar correcciones con el objeto de recuperar el 
+tiempo perdido.
+• Se aplican desde la asignación de las tareas hasta su 
+aceptación interna.
+• Las tareas de Seguimiento y Control se ponen en marcha 
+a medida que se ejecutan las distintas tareas de los 
+procesos de Análisis, Diseño, Construcción, Implantación 
+y Mantenimiento del Sistema.
+1.3. - 15
+• Cuatro funciones (4):
+GPS 2
+Comunicación
+al equipo
+del proyecto
+GPS 3
+Seguimiento
+de tareas
+GPS 5
+Petición de
+cambios de
+requisitos
+GPS 6
+Análisis de
+la petición
+de cambio
+de requisitos
+GPS 7
+Aprobación
+de la solución
+GPS 8
+Estimación del
+esfuerzo y
+Planificación
+de la solución
+GPS 9
+Registro del
+cambio de
+requisitos
+GPS 4
+Análisis y
+registro de
+la incidencia
+GPS 10
+Finalización
+de la tarea
+GPS 11
+Actualización
+de la
+planificación
+GPS 12
+Reuniones de
+seguimiento
+GPS 1
+Asignación
+detallada
+de tareas
+GPS 13
+Aceptación
+GPS 2
+Comunicación
+al equipo
+del proyecto
+GPS 3
+Seguimiento
+de tareas
+GPS 5
+Petición de
+cambios de
+requisitos
+GPS 6
+Análisis de
+la petición
+de cambio
+de requisitos
+GPS 7
+Aprobación
+de la solución
+GPS 8
+Estimación del
+esfuerzo y
+Planificación
+de la solución
+GPS 9
+Registro del
+cambio de
+requisitos
+GPS 4
+Análisis y
+registro de
+la incidencia
+GPS 10
+Finalización
+de la tarea
+GPS 11
+Actualización
+de la
+planificación
+GPS 12
+Reuniones de
+seguimiento
+GPS 1
+Asignación
+detallada
+de tareas
+GPS 13
+Aceptación
+2) Cambio en los requisitos
+3) Incidencias y problemas
+1) Asignación y seguimiento
+4) Control, reacción e informes
+Métrica V3 – GPS (Seguimiento y Control) 
+1.3. - 16
+• 1) Asignación y seguimiento
+▫ Para que una tarea finalice con éxito es importante asignarla a un 
+técnico capaz de desarrollarla, por lo que se debe estudiar muy 
+bien cada tarea antes de su asignación y conocer los 
+conocimientos y capacidades de los componentes del equipo
+de proyecto. 
+▫ Informar al equipo de proyecto de las características del mismo y 
+comunicar a cada miembro las tareas específicas que va a 
+desarrollar. 
+▫ Seguimiento de todas las tareas que están siendo desarrolladas, 
+revisando con cada uno de los responsables de las tareas la fecha 
+real de comienzo, el tiempo empleado hasta el momento en su 
+realización, la apreciación del tiempo que queda para terminarla y 
+los problemas o incidencias encontradas. 
+Métrica V3 – GPS (Seguimiento y Control) 
+1.3. - 17
+• Asignación y seguimiento
+Métrica V3 – GPS (Seguimiento y Control) 
+1.3. - 18
+• 2) Cambio en los requisitos
+▫ El usuario formula una petición de cambio de los requisitos 
+iniciales.
+▫ Analizar en detalle la petición, contemplando los posibles cambios 
+en la funcionalidad y el impacto que el cambio pedido tendría sobre 
+el resto del Sistema de Información. Estudiar las posibles 
+alternativas de solución, considerando para cada alternativa los 
+recursos, esfuerzo, tiempo y coste que supone.
+▫ Elegir una solución y planificar las nuevas actividades que 
+genera y replanificar las tareas que se ven afectadas (por 
+dependencias con las nuevas o por reorganización de los recursos). 
+▫ Por su gravedad, es el último recurso al que hay que recurrir para 
+resolver un problema.
+Métrica V3 – GPS (Seguimiento y Control) 
+1.3. - 19
+• Cambio en los requisitos (I)
+Métrica V3 – GPS (Seguimiento y Control) 
+1.3. - 20
+• Cambio en los requisitos (II)
+▫ Se prevén cuatro (4) posibilidades:
+ El Comité rechaza la petición, archivándose ésta como 
+rechazada indicándose el porqué.
+ El Comité juzga que la petición es necesaria, pero que el coste o 
+la dilatación son excesivos. El Equipo del Proyecto lo revisa.
+ El Comité de Seguimiento aprueba la petición.
+ El Comité de Seguimiento aprueba la petición pero decide 
+aplazar su desarrollo hasta otro momento.
+Métrica V3 – GPS (Seguimiento y Control) 
+1.3. - 21
+• Cambio en los requisitos (III)
+Métrica V3 – GPS (Seguimiento y Control) 
+1.3. - 22
+• 3) Incidencias y problemas
+▫ Conocer las tareas a las que afecta la incidencia y evaluar 
+su impacto en términos de:
+ Horas necesarias para resolverla.
+ Retrasos previstos.
+ Recursos afectados.
+▫ Plantear posibles alternativas de solucionar la incidencia y 
+elegir una, designando a los miembros del equipo de proyecto 
+encargados de realizarla. De acuerdo con la solución adoptada 
+habrá que revisar y ajustar la planificación del proyecto.
+▫ Registrar la incidencia para imputar sus costes e prevenir que 
+vuelva a ocurrir.
+Métrica V3 – GPS (Seguimiento y Control) 
+1.3. - 23
+• Incidencias y problemas
+Métrica V3 – GPS (Seguimiento y Control) 
+1.3. - 24
+• Control, reacción e informes
+▫ El Jefe de proyecto deberá comprobar las tareas que han 
+finalizado correctamente y registrar su fecha de finalización y el 
+esfuerzo real empleado.
+▫ Con los datos obtenidos en el seguimiento de tareas, gestión de 
+incidencias y cambios de requisitos, el Jefe de proyecto debe:
+ Actualizar la planificación detallada del proyecto para adecuar el 
+estado de cada tarea a la situación real. 
+ Estimar cual será la evolución futura del proyecto y decidir en 
+consecuencia (replanificar o corregir si es necesario). 
+ Informar al Equipo de proyecto y al Comité de dirección de lo 
+realizado, las incidencias y desviaciones detectadas junto con 
+las acciones encaminadas a corregirlas y las variaciones en los 
+recursos. 
+Métrica V3 – GPS (Seguimiento y Control) 
+1.3. - 25
+• Control, reacción e informes (I)
+Métrica V3 – GPS (Seguimiento y Control) 
+1.3. - 26
+• Control, reacción e informes (II)
+Métrica V3 – GPS (Seguimiento y Control) 
+1.3. - 27
+Métrica V3 – GPF (Finalización del Proyecto) 
+• Su objetivo es dar por concluido el proyecto una vez aceptado por 
+el usuario.
+• Esta actividad consiste en resumir los datos del proyecto, en 
+cuanto a funcionalidad, tecnología, equipo técnico, formación 
+recibida, experiencias, logros, problemas encontrados y cualquier 
+dato que el Jefe de proyecto considere de interés. 
+• Información  apoyo a proyectos futuros (aprovechando las 
+experiencias y tratando de evitar incurrir en los mismos errores)
+• Las actividades de finalización son:
+▫ Realizar el balance final del proyecto.
+▫ Registrar toda la información de gestión del proyecto
+1.3. - 28
+• El Histórico de Proyectos es una base de datos la información 
+importante de todos los proyectos de la organización (métricas de 
+gestión de proyectos). 
+• Ejemplo: la plataforma tecnológica donde se ha trabajado, la 
+metodología y el entorno metodológico (herramientas Case), las 
+incidencias ocurridas, aspectos funcionales y los organizativos.
+• Toda la documentación de gestión del proyecto será ordenada y 
+archivada. Así mismo se registrará la versión del sistema.
+Métrica V3 – GPF (Finalización del Proyecto) 
+1.3. - 29
+PMBOK - Introducción 
+ PMBOK: Manual que brinda a las organizaciones un conjunto de 
+procesos, modelos de administración, criterios y más aspectos 
+favorables para la dirección de proyectos. 
+ Proyect Management Body Of Knowledge, creado por PMI 
+(Proyect Management Institute). 
+ PMBOK surge de la necesidad de poseer un manual de 
+referencia para los gestores de proyectos.
+ Unifica el léxico, conocimientos, habilidades y prácticas.
+ Documento usado por PMI para el examen de certificación PMI
+(Proyect Management Professional).
+ Existen distintas versiones desde 1996. Última revisión: 2017
+(sexta edición).
+1.3. - 30
+PMBOK – Definiciones y conceptos
+ Proyecto: esfuerzo temporal iniciado para crear un único 
+producto o servicio.
+ Gestión de proyectos: aplicación de conocimientos, 
+habilidades y técnicas para las actividades de un proyecto 
+con el objeto de satisfacer las necesidades y expectativas.
+ PMBOK establece tres apartados:
+ Fases y Ciclo de Vida
+ Procesos
+ Áreas de conocimiento
+1.3. - 31
+PMBOK – Fases y ciclo de vida
+ Fases: marcadas por uno o mas entregables.
+ Ciclo de vida (CV): determina el comienzo y el final de un proyecto.
+ El CV define: 
+ Trabajos técnicos realizados en cada fase.
+ Quién debe estar involucrado en cada fase.
+ ¡Ojo!: No confundir CV del proyecto con el CV del producto.
+ Metodología de gestión de proyecto: descripción detallada del CV.
+1.3. - 32
+PMBOK – Procesos
+ Proceso: serie de acciones que tiene como consecuencia un 
+resultado.
+ Relaciones entre procesos: 
+ Inputs. Documentos mediante los cuales se actuará.
+ Herramientas y técnicas. Mecanismos aplicados a los inputs para 
+crear los outputs.
+ Outputs. Documentos que son el resultado de los procesos.
+ PMBOK organiza los procesos en 5 grupos.
+1.3. - 33
+PMBOK – Procesos
+ Dos categorías (2):
+ 1) Procesos de gestión. Describir y organizar el trabajo del 
+proyecto.
+ 2) Procesos orientados al producto. Especificar y crear el 
+producto del proyecto.
+ División en subprocesos de dos tipos (2): 
+ Básicos. Son aquellos procesos que tienen claras dependencias y 
+requieren ser ejecutados de la misma manera en la mayoría de los 
+proyectos.
+ De facilitación. Son aquellos procesos que dependen de la 
+naturaleza del proyecto y no tienen que, obligatoriamente, 
+ejecutarse de manera regular.
+1.3. - 34
+PMBOK - Procesos
+1.3. - 35
+PMBOK – Procesos de iniciación
+• Iniciación: Se reconoce que un proyecto o fase 
+debe comenzar y se comprometen a ello.
+• Tiene un único subproceso: Iniciación. 
+1.3. - 36
+PMBOK – Proceso de planificación
+• El proceso de Planificación desarrolla y mantiene un esquema 
+revisable de tareas a desarrollar para completar el proyecto. 
+• Este esquema se denomina plan del proyecto.
+1.3. - 37
+PMBOK – Proceso de ejecución
+• El proceso de ejecución coordina a las personas y otros recursos 
+para desarrollar o llevar a cabo el plan del proyecto anteriormente 
+definido. 
+1.3. - 38
+PMBOK – Proceso de control
+• El proceso de control 
+asegura que los 
+objetivos del proyectos 
+sean cumplidos a través 
+de la monitorización y 
+medición del avance y 
+toma de acciones 
+correctivas cuando sea 
+necesario.
+• Ha de llevar a cabo 
+acciones preventivas, 
+anticipándose a posibles 
+problemas.
+1.3. - 39
+PMBOK – Proceso de cierre
+• El proceso de cierre formaliza la aceptación del 
+proyecto y permite una terminación ordenada.
+1.3. - 40
+PMBOK – Relación entre procesos
+• Los procesos se relacionan mediante los resultados que 
+producen, que son a su vez entradas de otros
+• No son necesariamente secuenciales y puede haber 
+feedback
+1.3. - 41
+PMBOK – Áreas de conocimiento
+• Describen conocimiento y prácticas de la 
+administración de proyectos utilizadas en los 
+procesos.
+• Se han definido nueve (9) áreas de conocimiento.
+• Dependiendo del área de conocimiento se 
+requerirán unos procesos y otros para su 
+realización.
+1.3. - 42
+PMBOK – Áreas de conocimiento
+1) Gestión de integración del proyecto.
+Describe los procesos necesarios para asegurar la 
+coordinación de todos los elementos de proyecto.
+Subprocesos:
+▫ Desarrollo del plan de proyecto (Planificación)
+▫ Ejecución del plan de proyecto (Ejecución)
+▫ Control de cambios generales (Control) 
+1.3. - 43
+PMBOK – Áreas de conocimiento
+2) Gestión del Alcance.
+Describe todos los procesos necesarios para asegurar 
+que el proyecto incluye todo el trabajo requerido, y 
+sólo el trabajo requerido para llegar al éxito del 
+proyecto.
+Subprocesos:
+▫ Iniciación
+▫ Planificación del alcance y Definición del alcance 
+(Planificación)
+1.3. - 44
+PMBOK – Áreas de conocimiento
+3) Gestión del Tiempo
+Describe los procesos requeridos para asegurar los 
+tiempos del proyecto.
+Subprocesos:
+▫ Definición de actividades, Secuenciación de 
+actividades y Estimación de duración de actividades 
+(Planificación)
+▫ Desarrollo del cronograma (Ejecución)
+▫ Control del cronograma (Control)
+1.3. - 45
+PMBOK – Áreas de conocimiento
+4) Gestión de Costos
+Describe los procesos necesarios para asegurar que 
+el proyecto es completado sin salirse del presupuesto 
+aprobado.
+Subprocesos:
+▫ Planificación de los recursos, Estimación de costos y 
+Presupuesto de costo (Planificación)
+▫ Control de costos (Control)
+1.3. - 46
+PMBOK – Áreas de conocimiento
+5) Gestión de Calidad
+Describe los procesos requeridos para asegurar que 
+se satisfacen las necesidades para las cuales fue 
+concedido el proyecto.
+Subprocesos:
+▫ Planificación de la calidad (Planificación)
+▫ Aseguramiento de la calidad (Ejecución)
+▫ Control de calidad (Control)
+1.3. - 47
+PMBOK – Áreas de conocimiento
+6) Gestión de Recursos Humanos
+Describe todos los procesos necesarios para obtener 
+el uso más eficiente de todas las personas
+involucradas en el proyecto.
+Subprocesos:
+▫ Planificación organizacional, Adquisición del 
+personal (Planificación)
+▫ Desarrollo de equipo (Ejecución)
+1.3. - 48
+PMBOK – Áreas de conocimiento
+7) Gestión de Comunicación
+Describe los procesos requeridos para asegurar la 
+generación, recopilación, difusión, almacenamiento y 
+disposición de la información del proyecto de modo 
+puntual.
+Subprocesos:
+▫ Planificación de la comunicación (Planificación)
+▫ Distribución de la información (Ejecución)
+▫ Informes de desenvolvimiento (Control)
+▫ Cierre administrativo (Cierre)
+1.3. - 49
+PMBOK – Áreas de conocimiento
+8) Gestión de Riesgos
+Describe los procesos relevantes a la identificación, 
+análisis y respuesta de los riesgos que podrían darse 
+en el proyecto.
+Subprocesos:
+▫ Planificación de gestión de riesgos, Identificación de 
+riesgos, Análisis cualitativo de riesgos, Análisis 
+cuantitativo del riego y Desarrollo de la respuesta al 
+riesgo (Planificación)
+▫ Monitorización y control de riesgos (Control)
+1.3. - 50
+PMBOK – Áreas de conocimiento
+9) Gestión de la Compra
+Describe los procesos requeridos para adquirir bienes y 
+servicios de entidades externas a la organización.
+• Subprocesos:
+▫ Planificación de adquisición y Planificación de 
+solicitud (Planificación)
+▫ Solicitud, Selección de la fuente y Administración de 
+contrato (Ejecución)
+▫ Cierre del contrato (Cierre)
