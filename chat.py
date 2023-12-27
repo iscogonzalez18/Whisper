@@ -8,7 +8,7 @@ from colorama import Fore, Style
 
 print("Loading OpenAI GPT...")
 openai.organization = "org-d6sOkmC5UFSQEz57mmi0kpzM"
-openai.api_key = "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"
+openai.api_key = # api key here
 
 def chat(prompt):
     # https://beta.openai.com/docs/api-reference/completions/create
